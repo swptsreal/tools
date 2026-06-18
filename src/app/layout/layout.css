@@ -1,0 +1,124 @@
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+    color: #111827;
+}
+
+.app-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand div {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.brand span,
+.header-search,
+.app-footer {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.header-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 240px;
+    padding: 8px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+.app-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+}
+
+.app-sidebar {
+    width: 240px;
+    padding: 16px;
+    border-right: 1px solid #e5e7eb;
+    background: #ffffff;
+    overflow-y: auto;
+}
+
+.tool-group h2 {
+    margin: 0 0 8px;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.tool-group nav {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.tool-group a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: #374151;
+    text-decoration: none;
+}
+
+.tool-group a.active,
+.tool-group a:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.app-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.app-footer {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.offline-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+@media (max-width: 800px) {
+    .header-search {
+        display: none;
+    }
+
+    .app-sidebar {
+        width: 190px;
+    }
+}

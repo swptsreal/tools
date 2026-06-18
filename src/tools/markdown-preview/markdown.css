@@ -1,0 +1,43 @@
+.markdown-preview {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px;
+    color: #1f2937;
+    line-height: 1.7;
+}
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3 {
+    line-height: 1.25;
+}
+
+.markdown-preview pre {
+    overflow: auto;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f3f4f6;
+}
+
+.markdown-preview code {
+    font-family: Consolas, monospace;
+}
+
+.markdown-preview table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.markdown-error {
+    padding: 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #991b1b;
+    background: #fef2f2;
+}

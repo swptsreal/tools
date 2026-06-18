@@ -1,0 +1,70 @@
+.tool-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.tool-header h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.tool-header p {
+    margin: 4px 0 0;
+    color: #6b7280;
+}
+
+.tool-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.split-workspace {
+    height: calc(100vh - 56px - 34px - 73px);
+    display: grid;
+    grid-template-columns: minmax(320px, 42%) minmax(0, 1fr);
+    overflow: hidden;
+}
+
+.split-panel {
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+}
+
+.split-left {
+    border-right: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.split-right {
+    background: #f8fafc;
+}
+
+.tool-editor {
+    height: 100%;
+    min-height: 100%;
+    padding: 16px;
+    border: 0;
+    border-radius: 0;
+    font-family: Consolas, monospace;
+    font-size: 14px;
+    resize: none;
+}
+
+@media (max-width: 1000px) {
+    .split-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(280px, 45%) minmax(0, 1fr);
+    }
+
+    .split-left {
+        border-right: 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+}

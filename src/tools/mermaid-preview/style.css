@@ -1,0 +1,48 @@
+.tool-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mermaid-preview {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.preview-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.preview-toolbar button {
+    padding: 4px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.preview-canvas {
+    flex: 1;
+    overflow: auto;
+    padding: 24px;
+}
+
+.mermaid-svg {
+    transform-origin: top left;
+}
+
+.tool-error {
+    margin: 0;
+    padding: 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #991b1b;
+    background: #fef2f2;
+    white-space: pre-wrap;
+}

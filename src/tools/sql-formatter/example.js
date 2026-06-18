@@ -1,0 +1,1 @@
+export const sqlExample = `select users.id, users.name, count(orders.id) as order_count from users left join orders on orders.user_id = users.id where users.active = 1 group by users.id, users.name order by users.name`

@@ -1,3 +1,33 @@
+# Windows PowerShell file editing rule
+
+When editing or creating `.jsx`, `.tsx`, `.js`, `.ts`, `.css`, `.html`, or any file that may contain `${...}`, template literals, braces, quotes, or multiline content on Windows PowerShell:
+
+- Do not use PowerShell heredoc / here-string to write the file.
+- Do not use `echo`, `cat <<EOF`, `Set-Content @"..."@`, or inline PowerShell strings for large code blocks.
+- Instead, create a temporary Python script that writes the target file using `Path.write_text(...)`.
+- Run the Python script with `python script_name.py`.
+- Delete the temporary Python script after writing the file.
+
+Reason: PowerShell can interpret `${...}` inside expandable strings, which breaks JSX/template literal content.
+
+```powershell
+@'
+from pathlib import Path
+
+target = Path("src/pages/Home.jsx")
+
+target.parent.mkdir(parents=True, exist_ok=True)
+
+content = r'''PASTE_FULL_JSX_HERE'''
+
+target.write_text(content, encoding="utf-8", newline="\n")
+'@ | Set-Content -Encoding UTF8 codex_write_file.py
+
+python codex_write_file.py
+
+Remove-Item codex_write_file.py
+```
+
 # Agent Workflow
 
 This project is an offline-first React/Vite toolkit. Keep changes small, fast, and easy to verify.

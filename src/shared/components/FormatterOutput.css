@@ -1,0 +1,205 @@
+.formatter-output-wrap {
+    position: relative;
+    height: 100%;
+    overflow: auto;
+    font-family: Consolas, 'Cascadia Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    background: var(--fo-bg);
+    color: var(--fo-fg);
+    outline: none;
+    tab-size: 4;
+}
+
+.fo-output {
+    padding: 8px 0;
+    min-width: max-content;
+}
+
+.fo-line {
+    display: flex;
+    align-items: baseline;
+    min-height: 1.6em;
+    padding-right: 16px;
+}
+
+.fo-line.fo-folded {
+    display: none;
+}
+
+.fo-output {
+    counter-reset: fo-line;
+}
+
+.fo-line::before {
+    counter-increment: fo-line;
+    content: counter(fo-line);
+    display: inline-block;
+    min-width: 3ch;
+    text-align: right;
+    padding-right: 12px;
+    padding-left: 8px;
+    color: var(--fo-gutter-fg);
+    user-select: none;
+    -webkit-user-select: none;
+    flex-shrink: 0;
+    font-size: 12px;
+    border-right: 1px solid var(--fo-border);
+    margin-right: 12px;
+    background: var(--fo-gutter-bg);
+    font-family: Consolas, monospace;
+}
+
+.fo-fold-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--fo-gutter-fg);
+    font-size: 8px;
+    flex-shrink: 0;
+    line-height: 1;
+    border-radius: 2px;
+}
+
+.fo-fold-toggle:hover {
+    color: var(--fo-fg);
+    background: var(--fo-hover-bg);
+}
+
+.fo-fold-spacer {
+    display: inline-block;
+    width: 18px;
+    flex-shrink: 0;
+}
+
+.fo-code {
+    white-space: pre;
+    flex: 1;
+}
+
+.fo-fold-placeholder {
+    color: var(--fo-gutter-fg);
+    margin-left: 6px;
+    font-style: italic;
+    user-select: none;
+}
+
+/* Search bar */
+.fo-search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--fo-gutter-bg);
+    border-bottom: 1px solid var(--fo-border);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.fo-search-input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--fo-input-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--fo-bg);
+    color: var(--fo-fg);
+    outline: none;
+}
+
+.fo-search-input:focus {
+    border-color: var(--fo-accent);
+    box-shadow: 0 0 0 2px var(--fo-accent-shadow);
+}
+
+.fo-search-count {
+    font-size: 12px;
+    color: var(--fo-gutter-fg);
+    white-space: nowrap;
+    min-width: 5ch;
+    text-align: right;
+}
+
+.fo-search-nav,
+.fo-search-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--fo-input-border);
+    border-radius: 4px;
+    background: var(--fo-bg);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--fo-fg);
+    flex-shrink: 0;
+}
+
+.fo-search-nav:hover,
+.fo-search-close:hover {
+    background: var(--fo-hover-bg);
+    border-color: var(--fo-gutter-fg);
+}
+
+/* Match highlights */
+.fo-match {
+    background: var(--fo-match-bg);
+    color: var(--fo-match-fg);
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+.fo-match.fo-match-current {
+    background: var(--fo-match-current-bg);
+    color: var(--fo-match-current-fg);
+}
+
+/* Prism token colors */
+.fo-output .token.comment,
+.fo-output .token.prolog,
+.fo-output .token.doctype,
+.fo-output .token.cdata { color: var(--fo-token-comment); font-style: italic; }
+
+.fo-output .token.punctuation { color: var(--fo-token-punctuation); }
+
+.fo-output .token.property,
+.fo-output .token.tag,
+.fo-output .token.constant,
+.fo-output .token.symbol,
+.fo-output .token.deleted { color: var(--fo-token-tag); }
+
+.fo-output .token.boolean,
+.fo-output .token.number { color: var(--fo-token-number); }
+
+.fo-output .token.selector,
+.fo-output .token.attr-name,
+.fo-output .token.string,
+.fo-output .token.char,
+.fo-output .token.builtin,
+.fo-output .token.inserted { color: var(--fo-token-string); }
+
+.fo-output .token.operator,
+.fo-output .token.entity,
+.fo-output .token.url { color: var(--fo-token-operator); }
+
+.fo-output .token.atrule,
+.fo-output .token.attr-value,
+.fo-output .token.keyword { color: var(--fo-token-keyword); }
+
+.fo-output .token.function { color: var(--fo-token-function); }
+
+.fo-output .token.regex,
+.fo-output .token.important,
+.fo-output .token.variable { color: var(--fo-token-variable); }

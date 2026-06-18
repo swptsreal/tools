@@ -11,12 +11,15 @@
     },
     "dependencies": {
         "antd": "^6.4.4",
+        "js-beautify": "^1.15.4",
         "lucide-react": "latest",
         "marked": "^17.0.1",
         "mermaid": "^11.12.2",
+        "prismjs": "^1.30.0",
         "react": "^19.2.1",
         "react-dom": "^19.2.1",
-        "react-router-dom": "^7.10.1"
+        "react-router-dom": "^7.10.1",
+        "sql-formatter": "^15.8.1"
     },
     "devDependencies": {
         "@playwright/test": "^1.61.0",

@@ -1,14 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
-import mermaid from 'mermaid'
 import { getMermaidRenderTarget } from '../../shared/utils/mermaidRenderTarget.js'
 
-mermaid.initialize({
-    startOnLoad: false,
-    theme: 'default',
-    securityLevel: 'strict',
-    suppressErrorRendering: true,
-    suppressErrorLogging: true
-})
+let mermaidInstance = null
+async function getMermaid() {
+    if (!mermaidInstance) {
+        const mod = await import('mermaid')
+        mermaidInstance = mod.default
+        mermaidInstance.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'strict',
+            suppressErrorRendering: true,
+            suppressErrorLogging: true
+        })
+    }
+    return mermaidInstance
+}
 
 export function MermaidPreview({ value }) {
     const [svg, setSvg] = useState('')
@@ -19,35 +26,37 @@ export function MermaidPreview({ value }) {
     const dragRef = useRef(null)
 
     useEffect(() => {
+        let cancelled = false
         async function renderPreview() {
             if (!value.trim()) {
                 setSvg('')
                 setError('')
                 return
             }
-
             try {
+                const mermaid = await getMermaid()
                 const result = await mermaid.render(
                     `mermaid-${Date.now()}`,
                     value,
                     getMermaidRenderTarget()
                 )
-                setSvg(result.svg)
-                setError('')
+                if (!cancelled) {
+                    setSvg(result.svg)
+                    setError('')
+                }
             } catch (renderError) {
-                setSvg('')
-                setError(renderError.message)
+                if (!cancelled) {
+                    setSvg('')
+                    setError(renderError.message)
+                }
             }
         }
-
         renderPreview()
+        return () => { cancelled = true }
     }, [value])
 
     const startPan = (event) => {
-        if (!svg || event.button !== 0) {
-            return
-        }
-
+        if (!svg || event.button !== 0) return
         event.currentTarget.setPointerCapture(event.pointerId)
         dragRef.current = {
             pointerId: event.pointerId,
@@ -60,11 +69,7 @@ export function MermaidPreview({ value }) {
 
     const movePan = (event) => {
         const drag = dragRef.current
-
-        if (!drag || drag.pointerId !== event.pointerId) {
-            return
-        }
-
+        if (!drag || drag.pointerId !== event.pointerId) return
         setPan({
             x: drag.startPan.x + event.clientX - drag.startX,
             y: drag.startPan.y + event.clientY - drag.startY
@@ -72,10 +77,7 @@ export function MermaidPreview({ value }) {
     }
 
     const stopPan = (event) => {
-        if (dragRef.current?.pointerId !== event.pointerId) {
-            return
-        }
-
+        if (dragRef.current?.pointerId !== event.pointerId) return
         dragRef.current = null
         setIsPanning(false)
     }

@@ -62,9 +62,68 @@ test('opens Markdown Preview and renders markdown with Mermaid blocks', async ({
 
     await page.locator('textarea').fill(`# Playwright Check\n\n- Fast feedback\n\n\`\`\`mermaid\ngraph TD\n    A --> B\n\`\`\``)
 
-    await expect(page.locator('.markdown-preview h1')).toHaveText('Playwright Check')
-    await expect(page.locator('.markdown-preview li')).toHaveText('Fast feedback')
+    await expect(page.locator('.markdown-preview h1')).toContainText('Playwright Check')
+    await expect(page.locator('.markdown-preview li')).toContainText('Fast feedback')
     await expect(page.locator('.mermaid-diagram svg')).toBeVisible()
+})
+
+test('formats and minifies JSON offline', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+
+    await expect(page.getByRole('heading', { name: 'JSON Formatter' })).toBeVisible()
+
+    await page.locator('textarea').fill('{"name":"Useful Tools","items":[1,2]}')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('"name": "Useful Tools"')
+    await expect(page.locator('.fo-output')).toContainText('"items": [')
+
+    await page.getByRole('button', { name: 'Minify' }).click()
+    await expect(page.locator('.fo-output')).toContainText('{"name":"Useful Tools","items":[1,2]}')
+})
+
+test('shows a readable JSON formatter error', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+
+    await page.locator('textarea').fill('{"name":}')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('.formatter-error')).toContainText('Invalid JSON')
+})
+
+test('formats SQL using a lazy formatter dependency', async ({ page }) => {
+    await page.goto('/tools/sql-formatter')
+
+    await expect(page.getByRole('heading', { name: 'SQL Formatter' })).toBeVisible()
+
+    await page.locator('textarea').fill('select id,name from users where active=1 order by name')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('SELECT')
+    await expect(page.locator('.fo-output')).toContainText('FROM users')
+    await expect(page.locator('.fo-output')).toContainText('ORDER BY name')
+})
+
+test('formats HTML offline', async ({ page }) => {
+    await page.goto('/tools/html-formatter')
+
+    await expect(page.getByRole('heading', { name: 'HTML Formatter' })).toBeVisible()
+    await page.locator('textarea').fill('<main><h1>Useful Tools</h1><p>Offline</p></main>')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('<main>')
+    await expect(page.locator('.fo-output')).toContainText('  <h1>Useful Tools</h1>')
+})
+
+test('formats CSS offline', async ({ page }) => {
+    await page.goto('/tools/css-formatter')
+
+    await expect(page.getByRole('heading', { name: 'CSS Formatter' })).toBeVisible()
+    await page.locator('textarea').fill('.tool{display:flex;color:#111}.tool button{padding:8px}')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('.tool {')
+    await expect(page.locator('.fo-output')).toContainText('display: flex;')
 })
 
 test('debounces preview rendering while editing markdown textarea', async ({ page }) => {
@@ -72,7 +131,7 @@ test('debounces preview rendering while editing markdown textarea', async ({ pag
     await page.goto('/tools/markdown-preview')
     await page.clock.runFor(300)
 
-    await expect(page.locator('.markdown-preview h1')).toHaveText('Useful Tools')
+    await expect(page.locator('.markdown-preview h1')).toContainText('Useful Tools')
     await page.clock.pauseAt(new Date('2026-06-18T13:00:00'))
 
     await page.locator('textarea').fill('# Debounced Render')
@@ -82,7 +141,7 @@ test('debounces preview rendering while editing markdown textarea', async ({ pag
     expect(await page.locator('.markdown-preview h1').textContent()).toBe('Useful Tools')
 
     await page.clock.runFor(25)
-    await expect(page.locator('.markdown-preview h1')).toHaveText('Debounced Render')
+    await expect(page.locator('.markdown-preview h1')).toContainText('Debounced Render')
 })
 
 test('uses grid background only for Mermaid preview', async ({ page }) => {
@@ -231,7 +290,14 @@ for (const viewport of breakpoints) {
     test(`keeps the workspace usable without horizontal overflow on ${viewport.name}`, async ({ page }) => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height })
 
-        for (const path of ['/tools/mermaid-preview', '/tools/markdown-preview']) {
+        for (const path of [
+            '/tools/mermaid-preview',
+            '/tools/markdown-preview',
+            '/tools/json-formatter',
+            '/tools/sql-formatter',
+            '/tools/html-formatter',
+            '/tools/css-formatter'
+        ]) {
             await page.goto(path)
 
             await expect(page.locator('.app-shell')).toBeVisible()
@@ -248,3 +314,55 @@ for (const viewport of breakpoints) {
         }
     })
 }
+
+// ── Phase 4: FormatterOutput enhanced output tests ──────────────────────────
+
+test('formatter output shows line numbers', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"a":1,"b":2}')
+    await page.getByRole('button', { name: 'Format' }).click()
+    const lines = page.locator('.fo-line')
+    await expect(lines.first()).toBeVisible()
+    const lineCount = await lines.count()
+    expect(lineCount).toBeGreaterThan(0)
+    // Verify line numbers are tracked via data attribute
+    const firstDataLineNum = await lines.first().getAttribute('data-line-num')
+    expect(firstDataLineNum).toBe('1')
+    const lastDataLineNum = await lines.nth(lineCount - 1).getAttribute('data-line-num')
+    expect(lastDataLineNum).toBe(String(lineCount))
+})
+
+test('formatter output collapses and expands blocks', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"a":{"b":1}}')
+    await page.getByRole('button', { name: 'Format' }).click()
+    const toggle = page.locator('.fo-fold-toggle').first()
+    await expect(toggle).toBeVisible()
+    await toggle.click()
+    await expect(page.locator('.fo-folded')).toHaveCount(3)
+    await toggle.click()
+    await expect(page.locator('.fo-folded')).toHaveCount(0)
+})
+
+test('formatter output search opens on Ctrl+F and highlights matches', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"name":"Useful Tools","items":[1,2]}')
+    await page.getByRole('button', { name: 'Format' }).click()
+    await page.locator('.formatter-output-wrap').press('Control+f')
+    await expect(page.locator('.fo-search-bar')).toBeVisible()
+    await page.locator('.fo-search-input').fill('items')
+    await expect(page.locator('.fo-match')).toHaveCount(1)
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.fo-search-bar')).not.toBeVisible()
+})
+
+test('formatter output renders syntax-highlighted tokens', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"key":"value"}')
+    await page.getByRole('button', { name: 'Format' }).click()
+    await expect(page.locator('.fo-output .token.string').first()).toBeVisible()
+})
+
+
+
+

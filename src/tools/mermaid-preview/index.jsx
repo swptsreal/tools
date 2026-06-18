@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
-import { ToolHeader } from '../../shared/components/ToolHeader.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
+import { useDebouncedValue } from '../../shared/hooks/useDebouncedValue.js'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
@@ -15,6 +16,7 @@ const toolId = 'mermaid-preview'
 
 export default function MermaidPreviewTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, mermaidExample))
+    const debouncedValue = useDebouncedValue(value, 300)
 
     useEffect(() => {
         saveDraft(toolId, value)
@@ -31,22 +33,24 @@ export default function MermaidPreviewTool() {
         message[result.ok ? 'success' : 'warning'](result.message)
     }
 
+    const actions = useMemo(
+        () => (
+            <>
+                <Upload beforeUpload={openFile} showUploadList={false} accept=".mmd,.txt,.md">
+                    <Button icon={<FileUp size={16} />}>Open</Button>
+                </Upload>
+                <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
+                <Button icon={<Download size={16} />} onClick={() => downloadTextFile(value, 'diagram.mmd')}>Download</Button>
+                <Button icon={<RotateCcw size={16} />} onClick={() => setValue(mermaidExample)}>Example</Button>
+            </>
+        ),
+        [value]
+    )
+
+    useToolActions(actions)
+
     return (
         <div className="tool-page">
-            <ToolHeader
-                title="Mermaid Preview"
-                description="Write and preview Mermaid diagrams offline."
-                actions={
-                    <>
-                        <Upload beforeUpload={openFile} showUploadList={false} accept=".mmd,.txt,.md">
-                            <Button icon={<FileUp size={16} />}>Open</Button>
-                        </Upload>
-                        <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
-                        <Button icon={<Download size={16} />} onClick={() => downloadTextFile(value, 'diagram.mmd')}>Download</Button>
-                        <Button icon={<RotateCcw size={16} />} onClick={() => setValue(mermaidExample)}>Example</Button>
-                    </>
-                }
-            />
             <SplitWorkspace
                 left={
                     <Input.TextArea
@@ -56,7 +60,7 @@ export default function MermaidPreviewTool() {
                         spellCheck={false}
                     />
                 }
-                right={<MermaidPreview value={value} />}
+                right={<MermaidPreview value={debouncedValue} />}
             />
         </div>
     )

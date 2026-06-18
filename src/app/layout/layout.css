@@ -1,63 +1,118 @@
 .app-shell {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
-    flex-direction: column;
+    overflow: hidden;
     background: #f8fafc;
     color: #111827;
 }
 
+.app-main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+}
+
 .app-header {
-    height: 56px;
+    flex: 0 0 auto;
+    min-height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    gap: 12px;
+    padding: 8px 20px;
     border-bottom: 1px solid #e5e7eb;
     background: #ffffff;
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.mobile-header-row {
+    display: none;
 }
 
-.brand div {
+.header-main {
+    min-width: 0;
     display: flex;
-    flex-direction: column;
-    line-height: 1.2;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #111827;
+    font-size: 18px;
 }
 
 .brand span,
-.header-search,
+.header-tool p,
 .app-footer {
     color: #6b7280;
     font-size: 13px;
 }
 
-.header-search {
+.header-tool {
+    min-width: 0;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 240px;
-    padding: 8px 10px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
+    flex-direction: column;
+    gap: 1px;
+    line-height: 1.2;
 }
 
-.app-body {
-    flex: 1;
+.header-tool h1 {
+    margin: 0;
+    overflow: hidden;
+    font-size: 20px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-tool p {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-actions {
+    flex: 0 0 auto;
     display: flex;
-    min-height: 0;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.header-actions .ant-btn {
+    height: 30px;
+    padding-inline: 9px;
+    font-size: 13px;
 }
 
 .app-sidebar {
-    width: 240px;
-    padding: 16px;
+    flex: 0 0 250px;
+    width: 250px;
+    padding: 20px 19px;
     border-right: 1px solid #e5e7eb;
     background: #ffffff;
     overflow-y: auto;
+}
+
+.mobile-nav-drawer .ant-drawer-body {
+    padding: 0;
+}
+
+.mobile-nav-drawer .ant-drawer-content-wrapper {
+    width: 298px !important;
+}
+
+.sidebar-brand {
+    height: 24px;
+    margin-bottom: 42px;
 }
 
 .tool-group h2 {
@@ -92,12 +147,15 @@
 }
 
 .app-content {
+    display: flex;
     flex: 1;
     min-width: 0;
+    min-height: 0;
     overflow: hidden;
 }
 
 .app-footer {
+    flex: 0 0 34px;
     height: 34px;
     display: flex;
     align-items: center;
@@ -114,11 +172,77 @@
 }
 
 @media (max-width: 800px) {
-    .header-search {
+    .app-shell {
+        flex-direction: column;
+    }
+
+    .app-header {
+        min-height: auto;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .mobile-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .mobile-header-brand {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+    }
+
+    .header-main {
+        align-items: flex-start;
+        gap: 8px;
+        justify-content: space-between;
+    }
+
+    .header-tool h1 {
+        font-size: 15px;
+    }
+
+    .header-tool p {
+        display: none;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+    }
+
+    .header-actions .ant-btn {
+        flex: 0 0 auto;
+    }
+
+    .desktop-sidebar {
         display: none;
     }
 
     .app-sidebar {
+        flex-basis: 190px;
         width: 190px;
+        padding: 16px 12px;
+    }
+
+    .mobile-sidebar {
+        width: 298px;
+        min-height: 100vh;
+        padding: 20px 19px;
+        border-right: 0;
+    }
+
+    .sidebar-brand {
+        margin-bottom: 28px;
     }
 }

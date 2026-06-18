@@ -13,27 +13,55 @@
 .preview-toolbar {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
+    gap: 6px;
+    padding: 5px 8px;
     border-bottom: 1px solid #e5e7eb;
     background: #ffffff;
 }
 
 .preview-toolbar button {
-    padding: 4px 10px;
+    min-width: 28px;
+    min-height: 26px;
+    padding: 2px 8px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     background: #ffffff;
     cursor: pointer;
 }
 
+.preview-toolbar span {
+    min-width: 42px;
+    color: #4b5563;
+    font-size: 12px;
+    text-align: center;
+}
+
 .preview-canvas {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     padding: 24px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    background:
+        linear-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.16) 1px, transparent 1px),
+        #f8fafc;
+    background-size: 24px 24px;
+}
+
+.preview-canvas.is-panning {
+    cursor: grabbing;
 }
 
 .mermaid-svg {
+    display: inline-block;
+    min-width: min-content;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
     transform-origin: top left;
 }
 

@@ -1,19 +1,34 @@
-import { Search, Wrench } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
+import { Button } from 'antd'
+import { Menu, Wrench } from 'lucide-react'
+import { tools } from '../../tools/registry.js'
 
-export function AppHeader() {
+export function AppHeader({ actions, onOpenNavigation }) {
+    const { pathname } = useLocation()
+    const activeTool = tools.find((tool) => pathname === `/tools/${tool.id}`)
+
     return (
         <header className="app-header">
-            <div className="brand">
-                <Wrench size={20} />
-                <div>
+            <div className="mobile-header-row">
+                <div className="mobile-header-brand">
+                    <Wrench size={18} />
                     <strong>Useful Tools</strong>
-                    <span>Offline utilities</span>
                 </div>
+                <Button
+                    aria-label="Open navigation"
+                    icon={<Menu size={18} />}
+                    onClick={onOpenNavigation}
+                />
             </div>
-            <div className="header-search" aria-label="Search tools placeholder">
-                <Search size={16} />
-                <span>Search tools</span>
+            <div className="header-main">
+                {activeTool ? (
+                    <div className="header-tool">
+                        <h1>{activeTool.name}</h1>
+                        <p>{activeTool.description}</p>
+                    </div>
+                ) : null}
             </div>
+            {actions ? <div className="header-actions">{actions}</div> : null}
         </header>
     )
 }

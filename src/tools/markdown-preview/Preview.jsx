@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { parse } from 'marked'
 import mermaid from 'mermaid'
+import { getMermaidRenderTarget } from '../../shared/utils/mermaidRenderTarget.js'
 
 function decodeHtml(html) {
     const textarea = document.createElement('textarea')
@@ -12,7 +13,7 @@ export function MarkdownPreview({ value }) {
     const [html, setHtml] = useState('')
 
     useEffect(() => {
-        const timer = window.setTimeout(async () => {
+        async function renderPreview() {
             let nextHtml = parse(value)
             const matches = [...nextHtml.matchAll(/<code class="language-mermaid">([\s\S]*?)<\/code>/g)]
 
@@ -20,7 +21,8 @@ export function MarkdownPreview({ value }) {
                 try {
                     const result = await mermaid.render(
                         `markdown-mermaid-${Date.now()}-${index}`,
-                        decodeHtml(matches[index][1])
+                        decodeHtml(matches[index][1]),
+                        getMermaidRenderTarget()
                     )
                     nextHtml = nextHtml.replace(
                         matches[index][0],
@@ -35,9 +37,9 @@ export function MarkdownPreview({ value }) {
             }
 
             setHtml(nextHtml)
-        }, 250)
+        }
 
-        return () => window.clearTimeout(timer)
+        renderPreview()
     }, [value])
 
     return (

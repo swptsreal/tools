@@ -1,9 +1,19 @@
 .markdown-preview {
     max-width: 920px;
+    min-height: 100%;
     margin: 0 auto;
     padding: 32px;
+    border-inline: 1px solid #e5e7eb;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
     color: #1f2937;
     line-height: 1.7;
+}
+
+.markdown-preview > * {
+    max-width: 780px;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 .markdown-preview h1,

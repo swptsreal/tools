@@ -1,4 +1,13 @@
+.tool-page {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .tool-header {
+    flex: 0 0 auto;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -25,9 +34,9 @@
 }
 
 .split-workspace {
-    height: calc(100vh - 56px - 34px - 73px);
-    display: grid;
-    grid-template-columns: minmax(320px, 42%) minmax(0, 1fr);
+    flex: 1;
+    min-height: 0;
+    width: 100%;
     overflow: hidden;
 }
 
@@ -46,8 +55,10 @@
     background: #f8fafc;
 }
 
-.tool-editor {
-    height: 100%;
+.split-left .tool-editor {
+    display: block;
+    width: 100%;
+    height: 100% !important;
     min-height: 100%;
     padding: 16px;
     border: 0;
@@ -58,11 +69,6 @@
 }
 
 @media (max-width: 1000px) {
-    .split-workspace {
-        grid-template-columns: 1fr;
-        grid-template-rows: minmax(280px, 45%) minmax(0, 1fr);
-    }
-
     .split-left {
         border-right: 0;
         border-bottom: 1px solid #e5e7eb;

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
-import { ToolHeader } from '../../shared/components/ToolHeader.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
+import { useDebouncedValue } from '../../shared/hooks/useDebouncedValue.js'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
@@ -16,6 +17,7 @@ const toolId = 'markdown-preview'
 
 export default function MarkdownPreviewTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, markdownExample))
+    const debouncedValue = useDebouncedValue(value, 300)
 
     useEffect(() => {
         saveDraft(toolId, value)
@@ -32,22 +34,24 @@ export default function MarkdownPreviewTool() {
         message[result.ok ? 'success' : 'warning'](result.message)
     }
 
+    const actions = useMemo(
+        () => (
+            <>
+                <Upload beforeUpload={openFile} showUploadList={false} accept=".md,.txt">
+                    <Button icon={<FileUp size={16} />}>Open</Button>
+                </Upload>
+                <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
+                <Button icon={<Download size={16} />} onClick={() => downloadTextFile(value, 'document.md', 'text/markdown')}>Download</Button>
+                <Button icon={<RotateCcw size={16} />} onClick={() => setValue(markdownExample)}>Example</Button>
+            </>
+        ),
+        [value]
+    )
+
+    useToolActions(actions)
+
     return (
         <div className="tool-page">
-            <ToolHeader
-                title="Markdown Preview"
-                description="Write Markdown and preview output offline."
-                actions={
-                    <>
-                        <Upload beforeUpload={openFile} showUploadList={false} accept=".md,.txt">
-                            <Button icon={<FileUp size={16} />}>Open</Button>
-                        </Upload>
-                        <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
-                        <Button icon={<Download size={16} />} onClick={() => downloadTextFile(value, 'document.md', 'text/markdown')}>Download</Button>
-                        <Button icon={<RotateCcw size={16} />} onClick={() => setValue(markdownExample)}>Example</Button>
-                    </>
-                }
-            />
             <SplitWorkspace
                 left={
                     <Input.TextArea
@@ -57,7 +61,7 @@ export default function MarkdownPreviewTool() {
                         spellCheck={false}
                     />
                 }
-                right={<MarkdownPreview value={value} />}
+                right={<MarkdownPreview value={debouncedValue} />}
             />
         </div>
     )

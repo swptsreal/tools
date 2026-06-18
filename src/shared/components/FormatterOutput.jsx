@@ -123,34 +123,6 @@ function markMatches(lineHtml, query, currentMatchIndex, lineMatchStart) {
 }
 
 function buildCssVars(token) {
-    const isDark = token.colorBgBase === '#000' ||
-        parseInt(token.colorBgBase?.replace('#', '') || 'ffffff', 16) < 0x808080
-    if (isDark) {
-        return {
-            '--fo-bg': token.colorBgContainer,
-            '--fo-fg': token.colorText,
-            '--fo-gutter-bg': token.colorBgElevated,
-            '--fo-gutter-fg': token.colorTextQuaternary,
-            '--fo-border': token.colorBorderSecondary,
-            '--fo-hover-bg': token.colorBgTextHover,
-            '--fo-input-border': token.colorBorder,
-            '--fo-accent': token.colorPrimary,
-            '--fo-accent-shadow': token.colorPrimaryBorder,
-            '--fo-match-bg': '#7c6200',
-            '--fo-match-fg': '#fef08a',
-            '--fo-match-current-bg': token.colorError,
-            '--fo-match-current-fg': '#ffffff',
-            '--fo-token-comment': token.colorTextTertiary,
-            '--fo-token-punctuation': token.colorTextSecondary,
-            '--fo-token-tag': '#f38ba8',
-            '--fo-token-number': '#89b4fa',
-            '--fo-token-string': '#a6e3a1',
-            '--fo-token-operator': '#fab387',
-            '--fo-token-keyword': '#cba6f7',
-            '--fo-token-function': '#89dceb',
-            '--fo-token-variable': '#fab387',
-        }
-    }
     return {
         '--fo-bg': token.colorBgContainer,
         '--fo-fg': token.colorText,
@@ -161,19 +133,19 @@ function buildCssVars(token) {
         '--fo-input-border': token.colorBorder,
         '--fo-accent': token.colorPrimary,
         '--fo-accent-shadow': token.colorPrimaryBorder,
-        '--fo-match-bg': '#fef08a',
-        '--fo-match-fg': 'inherit',
-        '--fo-match-current-bg': '#f97316',
-        '--fo-match-current-fg': '#ffffff',
-        '--fo-token-comment': '#6b7280',
-        '--fo-token-punctuation': token.colorText,
-        '--fo-token-tag': '#dc2626',
-        '--fo-token-number': '#2563eb',
-        '--fo-token-string': '#16a34a',
-        '--fo-token-operator': '#d97706',
-        '--fo-token-keyword': '#7c3aed',
-        '--fo-token-function': '#0891b2',
-        '--fo-token-variable': '#d97706',
+        '--fo-match-bg': token.colorWarningBg,
+        '--fo-match-fg': token.colorWarningText,
+        '--fo-match-current-bg': token.colorError,
+        '--fo-match-current-fg': token.colorBgContainer,
+        '--fo-token-comment': token.colorTextTertiary,
+        '--fo-token-punctuation': token.colorTextSecondary,
+        '--fo-token-tag': token.red || token.colorErrorText,
+        '--fo-token-number': token.blue || token.colorInfoText,
+        '--fo-token-string': token.green || token.colorSuccessText,
+        '--fo-token-operator': token.orange || token.colorWarningText,
+        '--fo-token-keyword': token.purple || '#8250df',
+        '--fo-token-function': token.cyan || '#0891b2',
+        '--fo-token-variable': token.orange || token.colorWarningText,
     }
 }
 

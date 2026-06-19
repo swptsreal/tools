@@ -86,7 +86,6 @@ Tác dụng:
 - URL Encoder Decoder: mã hóa, giải mã URL và xem nhanh query string.
 - HTML Entity Encoder Decoder: mã hóa và giải mã HTML entities.
 - JWT Decoder: đọc header/payload JWT offline, không xác minh chữ ký.
-- Hash Generator: tạo SHA-1, SHA-256, SHA-384 và SHA-512 từ text.
 
 ## Tools Sẽ Có
 
@@ -97,15 +96,13 @@ Tác dụng:
 - HTML Formatter
 - CSS Formatter
 
-### Encoder / Decoder
-
-- JWT Secret Generator
-
 ### Generator
 
-- UUID Generator
-- Password Generator
-- Fake Data Generator
+- Hash Generator: tạo SHA-1, SHA-256, SHA-384 và SHA-512 từ text.
+- UUID Generator: tạo một hoặc nhiều UUID v4 ngẫu nhiên offline.
+- Password Generator: tạo mật khẩu theo độ dài và nhóm ký tự đã chọn.
+- JWT Secret Generator: tạo secret base64url để dùng cho JWT signing.
+- Fake Data Generator: tạo JSON records giả để dùng thử UI, demo hoặc test thủ công.
 
 ### Text Tools
 

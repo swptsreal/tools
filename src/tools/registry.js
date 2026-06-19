@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Binary, Braces, CalendarClock, CodeXml, Database, FileCode2, FileJson, FileSpreadsheet, FileText, Fingerprint, KeyRound, Link, Palette, Workflow } from 'lucide-react'
+import { Binary, Braces, CalendarClock, CodeXml, BadgePlus, Database, FileCode2, FileJson, FileSpreadsheet, FileText, Fingerprint, KeyRound, Link, Palette, ShieldCheck, Workflow } from 'lucide-react'
 
 export const tools = [
     {
@@ -117,9 +117,41 @@ export const tools = [
     {
         id: 'hash-generator',
         name: 'Hash Generator',
-        group: 'Encoder / Decoder',
+        group: 'Generator',
         description: 'Generate SHA hashes for text offline.',
         icon: Fingerprint,
         Component: lazy(() => import('./hash-generator/index.jsx'))
+    },
+    {
+        id: 'uuid-generator',
+        name: 'UUID Generator',
+        group: 'Generator',
+        description: 'Generate UUID v4 values offline.',
+        icon: BadgePlus,
+        Component: lazy(() => import('./uuid-generator/index.jsx'))
+    },
+    {
+        id: 'password-generator',
+        name: 'Password Generator',
+        group: 'Generator',
+        description: 'Generate configurable passwords offline.',
+        icon: ShieldCheck,
+        Component: lazy(() => import('./password-generator/index.jsx'))
+    },
+    {
+        id: 'jwt-secret-generator',
+        name: 'JWT Secret Generator',
+        group: 'Generator',
+        description: 'Generate base64url JWT secrets offline.',
+        icon: KeyRound,
+        Component: lazy(() => import('./jwt-secret-generator/index.jsx'))
+    },
+    {
+        id: 'fake-data-generator',
+        name: 'Fake Data Generator',
+        group: 'Generator',
+        description: 'Generate fake JSON records offline.',
+        icon: Database,
+        Component: lazy(() => import('./fake-data-generator/index.jsx'))
     }
 ]

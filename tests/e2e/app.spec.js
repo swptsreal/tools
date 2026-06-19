@@ -451,11 +451,18 @@ const encoderDecoderRoutes = [
     { path: '/tools/base64-encoder-decoder', heading: 'Base64 Encoder Decoder' },
     { path: '/tools/url-encoder-decoder', heading: 'URL Encoder Decoder' },
     { path: '/tools/html-entity-encoder-decoder', heading: 'HTML Entity Encoder Decoder' },
-    { path: '/tools/jwt-decoder', heading: 'JWT Decoder' },
-    { path: '/tools/hash-generator', heading: 'Hash Generator' }
+    { path: '/tools/jwt-decoder', heading: 'JWT Decoder' }
 ]
 
-for (const route of encoderDecoderRoutes) {
+const generatorRoutes = [
+    { path: '/tools/hash-generator', heading: 'Hash Generator' },
+    { path: '/tools/uuid-generator', heading: 'UUID Generator' },
+    { path: '/tools/password-generator', heading: 'Password Generator' },
+    { path: '/tools/jwt-secret-generator', heading: 'JWT Secret Generator' },
+    { path: '/tools/fake-data-generator', heading: 'Fake Data Generator' }
+]
+
+for (const route of [...encoderDecoderRoutes, ...generatorRoutes]) {
     for (const breakpoint of breakpoints) {
         test(`${route.heading} has no page overflow at ${breakpoint.name}`, async ({ page }) => {
             await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height })
@@ -466,6 +473,21 @@ for (const route of encoderDecoderRoutes) {
         })
     }
 }
+
+
+test('groups generator tools together in the sidebar', async ({ page }) => {
+    await page.goto('/tools/hash-generator')
+
+    const generatorGroup = page.locator('.app-sidebar').getByRole('heading', { name: 'Generator', exact: true })
+    await expect(generatorGroup).toBeVisible()
+
+    const sidebar = page.locator('.app-sidebar')
+    await expect(sidebar.getByRole('link', { name: 'Hash Generator' })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: 'UUID Generator' })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: 'Password Generator' })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: 'JWT Secret Generator' })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: 'Fake Data Generator' })).toBeVisible()
+})
 
 test('encodes and decodes Base64 with Unicode text offline', async ({ page }) => {
     await page.goto('/tools/base64-encoder-decoder')
@@ -687,4 +709,66 @@ test('generates SHA digests offline', async ({ page }) => {
 
     await expect(page.locator('.fo-output')).toContainText('SHA-512')
     await expect(page.locator('.fo-output')).not.toContainText('SHA-256')
+})
+
+
+test('generates UUID values offline', async ({ page }) => {
+    await page.goto('/tools/uuid-generator')
+
+    await expect(page.getByRole('heading', { name: 'UUID Generator' })).toBeVisible()
+    await page.getByLabel('Count').fill('3')
+    await page.getByRole('main').getByRole('button', { name: 'Generate UUIDs' }).click()
+
+    const output = page.locator('.fo-output')
+    await expect(output).toContainText(/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i)
+
+    const uuids = await output.locator('.fo-code').evaluateAll((nodes) => nodes.map((node) => node.textContent.trim()).filter(Boolean))
+    expect(uuids).toHaveLength(3)
+    expect(new Set(uuids).size).toBe(3)
+})
+
+test('generates configurable passwords offline', async ({ page }) => {
+    await page.goto('/tools/password-generator')
+
+    await expect(page.getByRole('heading', { name: 'Password Generator' })).toBeVisible()
+    await page.getByLabel('Length').fill('24')
+    await page.getByLabel('Include symbols').check()
+    await page.getByRole('main').getByRole('button', { name: 'Generate Password' }).click()
+
+    const password = (await page.locator('.fo-output').textContent()).trim()
+    expect(password).toHaveLength(24)
+    expect(password).toMatch(/[A-Z]/)
+    expect(password).toMatch(/[a-z]/)
+    expect(password).toMatch(/[0-9]/)
+    expect(password).toMatch(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/)
+})
+
+test('generates JWT secrets offline', async ({ page }) => {
+    await page.goto('/tools/jwt-secret-generator')
+
+    await expect(page.getByRole('heading', { name: 'JWT Secret Generator' })).toBeVisible()
+    await page.getByLabel('Bytes').fill('48')
+    await page.getByRole('main').getByRole('button', { name: 'Generate Secret' }).click()
+
+    const secret = (await page.locator('.fo-output').textContent()).trim()
+    expect(secret).toMatch(/^[A-Za-z0-9_-]+$/)
+    expect(secret.length).toBeGreaterThanOrEqual(64)
+})
+
+test('generates fake data records offline', async ({ page }) => {
+    await page.goto('/tools/fake-data-generator')
+
+    await expect(page.getByRole('heading', { name: 'Fake Data Generator' })).toBeVisible()
+    await page.getByLabel('Records').fill('2')
+    await page.getByRole('main').getByRole('button', { name: 'Generate Data' }).click()
+
+    const output = page.locator('.fo-output')
+    await expect(output).toContainText('"id"')
+    await expect(output).toContainText('"name"')
+    await expect(output).toContainText('"email"')
+
+    const jsonText = await output.locator('.fo-code').evaluateAll((nodes) => nodes.map((node) => node.textContent).join('\n'))
+    const records = JSON.parse(jsonText)
+    expect(records).toHaveLength(2)
+    expect(records[0]).toEqual(expect.objectContaining({ id: expect.any(String), name: expect.any(String), email: expect.any(String) }))
 })

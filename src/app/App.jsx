@@ -21,7 +21,7 @@ export default function App() {
                         <Route
                             index
                             element={
-                                <Navigate to="/tools/mermaid-preview" replace />
+                                <Navigate to="/tools/json-formatter" replace />
                             }
                         />
                         {toolRoutes.map((tool) => (

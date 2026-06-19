@@ -1,0 +1,26 @@
+.text-tool-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.text-stats-grid {
+    height: 100%;
+    overflow: auto;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-content: start;
+    gap: 12px;
+}
+
+.text-stats-grid strong,
+.text-stats-grid span {
+    display: block;
+}
+
+.text-stats-grid span {
+    margin-top: 8px;
+    font-size: 28px;
+    font-weight: 700;
+}

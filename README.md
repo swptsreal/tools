@@ -102,15 +102,15 @@ Tác dụng:
 - JWT Secret Generator: tạo secret base64url để dùng cho JWT signing.
 - Fake Data Generator: tạo JSON records giả để dùng thử UI, demo hoặc test thủ công.
 
+### Text
+
+- Text Diff: so sánh 2 đoạn text và hiển thị dòng thêm/xóa.
+- Sort Lines: sắp xếp dòng tăng/giảm, có tùy chọn trim, bỏ dòng rỗng, không phân biệt hoa thường.
+- Remove Duplicate Lines: xóa dòng trùng, giữ lần xuất hiện đầu tiên.
+- Case Converter: đổi lower/upper/title/sentence/camel/pascal/snake/kebab case.
+- Word/Character Counter: đếm ký tự, từ, dòng, đoạn, byte.
+
 ## Tools Sẽ Có
-
-### Text Tools
-
-- Text Diff
-- Sort Lines
-- Remove Duplicate Lines
-- Case Converter
-- Word/Character Counter
 
 ### Developer Tools
 

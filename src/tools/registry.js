@@ -1,23 +1,29 @@
 import { lazy } from 'react'
-import { Binary, Braces, CalendarClock, CodeXml, BadgePlus, Database, FileCode2, FileJson, FileSpreadsheet, FileText, Fingerprint, KeyRound, Link, Palette, ShieldCheck, Workflow } from 'lucide-react'
+import {
+    AlignLeft,
+    ArrowDownAZ,
+    Binary,
+    Braces,
+    CalendarClock,
+    CodeXml,
+    BadgePlus,
+    Database,
+    FileCode2,
+    FileJson,
+    FileSpreadsheet,
+    FileText,
+    Fingerprint,
+    GitCompareArrows,
+    KeyRound,
+    LetterText,
+    Link,
+    ListMinus,
+    Palette,
+    ShieldCheck,
+    Workflow
+} from 'lucide-react'
 
 export const tools = [
-    {
-        id: 'mermaid-preview',
-        name: 'Mermaid Preview',
-        group: 'Preview',
-        description: 'Write and preview Mermaid diagrams offline.',
-        icon: Workflow,
-        Component: lazy(() => import('./mermaid-preview/index.jsx'))
-    },
-    {
-        id: 'markdown-preview',
-        name: 'Markdown Preview',
-        group: 'Preview',
-        description: 'Write Markdown and preview output offline.',
-        icon: FileText,
-        Component: lazy(() => import('./markdown-preview/index.jsx'))
-    },
     {
         id: 'json-formatter',
         name: 'JSON Formatter',
@@ -50,6 +56,67 @@ export const tools = [
         icon: Palette,
         Component: lazy(() => import('./css-formatter/index.jsx'))
     },
+    {
+        id: 'mermaid-preview',
+        name: 'Mermaid Preview',
+        group: 'Preview',
+        description: 'Write and preview Mermaid diagrams offline.',
+        icon: Workflow,
+        Component: lazy(() => import('./mermaid-preview/index.jsx'))
+    },
+    {
+        id: 'markdown-preview',
+        name: 'Markdown Preview',
+        group: 'Preview',
+        description: 'Write Markdown and preview output offline.',
+        icon: FileText,
+        Component: lazy(() => import('./markdown-preview/index.jsx'))
+    },
+    {
+        id: 'text-diff',
+        name: 'Text Diff',
+        group: 'Text',
+        description:
+            'Compare two text blocks and show line differences offline.',
+        icon: GitCompareArrows,
+        Component: lazy(() => import('./text-diff/index.jsx'))
+    },
+    {
+        id: 'sort-lines',
+        name: 'Sort Lines',
+        group: 'Text',
+        description: 'Sort text lines ascending or descending offline.',
+        icon: ArrowDownAZ,
+        Component: lazy(() => import('./sort-lines/index.jsx'))
+    },
+    {
+        id: 'remove-duplicate-lines',
+        name: 'Remove Duplicate Lines',
+        group: 'Text',
+        description:
+            'Remove repeated lines while preserving first occurrence offline.',
+        icon: ListMinus,
+        Component: lazy(() => import('./remove-duplicate-lines/index.jsx'))
+    },
+    {
+        id: 'case-converter',
+        name: 'Case Converter',
+        group: 'Text',
+        description:
+            'Convert text between common letter and identifier cases offline.',
+        icon: LetterText,
+        Component: lazy(() => import('./case-converter/index.jsx'))
+    },
+    {
+        id: 'word-character-counter',
+        name: 'Word Character Counter',
+        group: 'Text',
+        description:
+            'Count words, characters, lines, paragraphs, and bytes offline.',
+        icon: AlignLeft,
+        Component: lazy(() => import('./word-character-counter/index.jsx'))
+    },
+
     {
         id: 'json-yaml-converter',
         name: 'JSON YAML Converter',
@@ -110,7 +177,8 @@ export const tools = [
         id: 'jwt-decoder',
         name: 'JWT Decoder',
         group: 'Encoder / Decoder',
-        description: 'Decode JWT headers and payloads offline without signature verification.',
+        description:
+            'Decode JWT headers and payloads offline without signature verification.',
         icon: KeyRound,
         Component: lazy(() => import('./jwt-decoder/index.jsx'))
     },

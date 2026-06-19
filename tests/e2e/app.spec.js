@@ -760,8 +760,8 @@ test('generates configurable passwords offline', async ({ page }) => {
     await page.getByLabel('Include symbols').check()
     await page.getByRole('main').getByRole('button', { name: 'Generate Password' }).click()
 
+    await expect.poll(async () => (await page.locator('.fo-output').textContent()).trim()).toHaveLength(24)
     const password = (await page.locator('.fo-output').textContent()).trim()
-    expect(password).toHaveLength(24)
     expect(password).toMatch(/[A-Z]/)
     expect(password).toMatch(/[a-z]/)
     expect(password).toMatch(/[0-9]/)
@@ -775,8 +775,8 @@ test('generates JWT secrets offline', async ({ page }) => {
     await page.getByLabel('Bytes').fill('48')
     await page.getByRole('main').getByRole('button', { name: 'Generate Secret' }).click()
 
+    await expect.poll(async () => (await page.locator('.fo-output').textContent()).trim()).toMatch(/^[A-Za-z0-9_-]+$/)
     const secret = (await page.locator('.fo-output').textContent()).trim()
-    expect(secret).toMatch(/^[A-Za-z0-9_-]+$/)
     expect(secret.length).toBeGreaterThanOrEqual(64)
 })
 
@@ -797,3 +797,113 @@ test('generates fake data records offline', async ({ page }) => {
     expect(records).toHaveLength(2)
     expect(records[0]).toEqual(expect.objectContaining({ id: expect.any(String), name: expect.any(String), email: expect.any(String) }))
 })
+
+
+test('word character counter reports live text metrics', async ({ page }) => {
+    await page.goto('/tools/word-character-counter')
+
+    await expect(page.getByRole('heading', { name: 'Word Character Counter' })).toBeVisible()
+
+    const editor = page.locator('textarea').first()
+    await editor.fill('Hello world\n\nXin chao Useful Tools')
+
+    await expect(page.getByText('Characters', { exact: true })).toBeVisible()
+    await expect(page.getByTestId('stat-characters')).toHaveText('34')
+    await expect(page.getByText('Characters without spaces')).toBeVisible()
+    await expect(page.getByTestId('stat-characters-no-spaces')).toHaveText('28')
+    await expect(page.getByText('Words', { exact: true })).toBeVisible()
+    await expect(page.getByTestId('stat-words')).toHaveText('6')
+    await expect(page.getByText('Lines', { exact: true })).toBeVisible()
+    await expect(page.getByTestId('stat-lines')).toHaveText('3')
+    await expect(page.getByText('Paragraphs', { exact: true })).toBeVisible()
+    await expect(page.getByTestId('stat-paragraphs')).toHaveText('2')
+})
+
+test('sort lines sorts text with options', async ({ page }) => {
+    await page.goto('/tools/sort-lines')
+
+    await expect(page.getByRole('heading', { name: 'Sort Lines' })).toBeVisible()
+
+    const editor = page.locator('textarea').first()
+    await editor.fill('banana\nApple\n\ncherry')
+
+    await page.getByLabel('Remove empty lines').check()
+    await page.getByLabel('Case insensitive').check()
+    await page.getByRole('button', { name: 'Sort' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('Apple')
+    const outputText = await page.locator('.fo-code').evaluateAll((nodes) => nodes.map((node) => node.textContent).join('\n'))
+    expect(outputText).toBe('Apple\nbanana\ncherry')
+})
+
+test('remove duplicate lines preserves first occurrence and shows summary', async ({ page }) => {
+    await page.goto('/tools/remove-duplicate-lines')
+
+    await expect(page.getByRole('heading', { name: 'Remove Duplicate Lines' })).toBeVisible()
+
+    const editor = page.locator('textarea').first()
+    await editor.fill('Alpha\nbeta\nalpha\n\nBETA')
+
+    await page.getByLabel('Ignore case').check()
+    await page.getByLabel('Remove empty lines').check()
+    await page.getByRole('button', { name: 'Remove Duplicates' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('Alpha')
+    const outputText = await page.locator('.fo-code').evaluateAll((nodes) => nodes.map((node) => node.textContent).join('\n'))
+    expect(outputText).toBe('Alpha\nbeta')
+    await expect(page.getByText('Removed 3 duplicate/empty lines')).toBeVisible()
+})
+
+test('case converter converts text to multiple cases', async ({ page }) => {
+    await page.goto('/tools/case-converter')
+
+    await expect(page.getByRole('heading', { name: 'Case Converter' })).toBeVisible()
+
+    const editor = page.locator('textarea').first()
+    await editor.fill('hello useful tools')
+
+    await page.getByLabel('Mode').click()
+    await page.getByText('Pascal Case').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
+
+    await expect(page.locator('.fo-code')).toHaveText('HelloUsefulTools')
+})
+
+test('text diff shows added and removed lines', async ({ page }) => {
+    await page.goto('/tools/text-diff')
+
+    await expect(page.getByRole('heading', { name: 'Text Diff' })).toBeVisible()
+
+    const editors = page.locator('textarea')
+    await editors.nth(0).fill('alpha\nbeta\ngamma')
+    await editors.nth(1).fill('alpha\nbeta changed\ngamma\ndelta')
+
+    await page.getByRole('button', { name: 'Compare' }).click()
+
+    await expect(page.getByText('- beta')).toBeVisible()
+    await expect(page.getByText('+ beta changed')).toBeVisible()
+    await expect(page.getByText('+ delta')).toBeVisible()
+})
+
+const textToolRoutes = [
+    '/tools/text-diff',
+    '/tools/sort-lines',
+    '/tools/remove-duplicate-lines',
+    '/tools/case-converter',
+    '/tools/word-character-counter'
+]
+
+for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1280, height: 800 }
+]) {
+    test(`text tools avoid horizontal overflow at ${viewport.width}x${viewport.height}`, async ({ page }) => {
+        await page.setViewportSize(viewport)
+
+        for (const route of textToolRoutes) {
+            await page.goto(route)
+            await expectNoHorizontalOverflow(page)
+        }
+    })
+}

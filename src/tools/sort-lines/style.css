@@ -1,0 +1,12 @@
+.text-tool-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.text-tool-summary {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #475569;
+    background: #f8fafc;
+}

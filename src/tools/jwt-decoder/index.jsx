@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileUp, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -20,27 +20,31 @@ function decodeBase64Url(part) {
     return new TextDecoder().decode(bytes)
 }
 
-function decodeJwt(token) {
+function decodeJwt(token, section = 'All') {
     const [headerPart, payloadPart, signaturePart = ''] = token.trim().split('.')
     if (!headerPart || !payloadPart) throw new Error('JWT must contain header and payload segments')
 
-    return JSON.stringify({
+    const decoded = {
         header: JSON.parse(decodeBase64Url(headerPart)),
         payload: JSON.parse(decodeBase64Url(payloadPart)),
         signature: signaturePart
-    }, null, 4)
+    }
+    if (section === 'Payload only') return JSON.stringify(decoded.payload, null, 4)
+    if (section === 'Header only') return JSON.stringify(decoded.header, null, 4)
+    return JSON.stringify(decoded, null, 4)
 }
 
 export default function JwtDecoderTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, jwtExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [section, setSection] = useState('All')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
     const runDecode = () => {
         try {
-            setResult(decodeJwt(value))
+            setResult(decodeJwt(value, section))
             setError('')
         } catch (err) {
             setResult('')
@@ -86,13 +90,19 @@ export default function JwtDecoderTool() {
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'jwt.json')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value])
+    ), [result, section, value])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page encoder-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Section</span>
+                        <Radio.Group optionType="button" size="small" value={section} onChange={(event) => setSection(event.target.value)} options={[{ label: 'All', value: 'All' }, { label: 'Header only', value: 'Header only' }, { label: 'Payload only', value: 'Payload only' }]} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={output}
             />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Database, Download, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -17,6 +17,7 @@ export default function SqlFormatterTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, sqlExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [keywordCase, setKeywordCase] = useState('upper')
 
     useEffect(() => {
         saveDraft(toolId, value)
@@ -25,7 +26,7 @@ export default function SqlFormatterTool() {
     const formatSql = async () => {
         try {
             const { format } = await import('sql-formatter')
-            setResult(format(value, { language: 'sql', keywordCase: 'upper' }))
+            setResult(format(value, { language: 'sql', keywordCase }))
             setError('')
         } catch (err) {
             setResult('')
@@ -64,7 +65,7 @@ export default function SqlFormatterTool() {
                 <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
             </>
         ),
-        [result, value]
+        [keywordCase, result, value]
     )
 
     useToolActions(actions)
@@ -72,6 +73,12 @@ export default function SqlFormatterTool() {
     return (
         <div className="tool-page formatter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Keyword case</span>
+                        <Radio.Group optionType="button" size="small" value={keywordCase} onChange={(event) => setKeywordCase(event.target.value)} options={[{ label: 'UPPERCASE', value: 'upper' }, { label: 'lowercase', value: 'lower' }, { label: 'Preserve', value: 'preserve' }]} />
+                    </>
+                )}
                 left={
                     <Input.TextArea
                         className="tool-editor"

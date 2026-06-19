@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Checkbox, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -17,6 +17,7 @@ const toolId = 'markdown-preview'
 
 export default function MarkdownPreviewTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, markdownExample))
+    const [lineBreaks, setLineBreaks] = useState(false)
     const debouncedValue = useDebouncedValue(value, 300)
 
     useEffect(() => {
@@ -53,6 +54,11 @@ export default function MarkdownPreviewTool() {
     return (
         <div className="tool-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <Checkbox checked={lineBreaks} onChange={(event) => setLineBreaks(event.target.checked)}>Line breaks</Checkbox>
+                    </>
+                )}
                 left={
                     <Input.TextArea
                         className="tool-editor"

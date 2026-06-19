@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileUp, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -20,7 +20,10 @@ const entityMap = {
     "'": '&#39;'
 }
 
-function encodeEntities(text) {
+function encodeEntities(text, style = 'Named') {
+    if (style === 'Numeric') {
+        return text.replace(/[&<>"']/g, (char) => `&#${char.codePointAt(0)};`)
+    }
     return text.replace(/[&<>"']/g, (char) => entityMap[char])
 }
 
@@ -34,17 +37,27 @@ export default function HtmlEntityEncoderDecoderTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, htmlEntityExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [mode, setMode] = useState('Encode')
+    const [entityStyle, setEntityStyle] = useState('Named')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
     const runEncode = () => {
-        setResult(encodeEntities(value))
+        setResult(encodeEntities(value, entityStyle))
         setError('')
     }
 
     const runDecode = () => {
         setResult(decodeEntities(value))
         setError('')
+    }
+
+    const run = () => {
+        if (mode === 'Decode') {
+            runDecode()
+            return
+        }
+        runEncode()
     }
 
     const openFile = async (file) => {
@@ -71,19 +84,26 @@ export default function HtmlEntityEncoderDecoderTool() {
             <Upload beforeUpload={openFile} showUploadList={false} accept=".html,.txt">
                 <Button icon={<FileUp size={16} />}>Open</Button>
             </Upload>
-            <Button icon={<FileCode2 size={16} />} type="primary" onClick={runEncode}>Encode</Button>
-            <Button icon={<FileCode2 size={16} />} onClick={runDecode}>Decode</Button>
+            <Button icon={<FileCode2 size={16} />} type="primary" onClick={run}>Run</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'html-entities.txt')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value])
+    ), [entityStyle, mode, result, value])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page encoder-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Mode</span>
+                        <Radio.Group optionType="button" size="small" value={mode} onChange={(event) => setMode(event.target.value)} options={[{ label: 'Encode', value: 'Encode' }, { label: 'Decode', value: 'Decode' }]} />
+                        <span className="tool-function-label">Entity style</span>
+                        <Radio.Group optionType="button" size="small" value={entityStyle} onChange={(event) => setEntityStyle(event.target.value)} options={[{ label: 'Named', value: 'Named' }, { label: 'Numeric', value: 'Numeric' }]} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="encoder-error">{error}</pre> : <FormatterOutput code={result} language="html" />}
             />

@@ -19,6 +19,7 @@ Dự án giúp xử lý các tác vụ nhỏ hằng ngày mà không cần mở 
 - Giao diện đơn giản: header, sidebar, vùng làm việc và footer.
 - Tool tách riêng theo từng nhóm, dễ tìm và dễ mở rộng.
 - Hỗ trợ copy, tải file, kéo-thả file và lưu bản nháp cục bộ tùy từng tool.
+- Các tool dùng split editor có thanh chức năng riêng trong panel trái; mọi xử lý vẫn chạy cục bộ trong trình duyệt.
 
 ## Cài Đặt
 

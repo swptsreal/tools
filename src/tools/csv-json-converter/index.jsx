@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileSpreadsheet, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -13,7 +13,7 @@ import './style.css'
 
 const toolId = 'csv-json-converter'
 
-function parseCsvLine(line) {
+function parseCsvLine(line, delimiter = ',') {
     const cells = []
     let current = ''
     let quoted = false
@@ -25,7 +25,7 @@ function parseCsvLine(line) {
             index++
         } else if (char === '"') {
             quoted = !quoted
-        } else if (char === ',' && !quoted) {
+        } else if (char === delimiter && !quoted) {
             cells.push(current.trim())
             current = ''
         } else {
@@ -36,8 +36,8 @@ function parseCsvLine(line) {
     return cells
 }
 
-function parseCsv(input) {
-    const rows = input.trim().split(/\r?\n/).map(parseCsvLine)
+function parseCsv(input, delimiter = ',') {
+    const rows = input.trim().split(/\r?\n/).map((line) => parseCsvLine(line, delimiter))
     const headers = rows.shift()
     if (!headers?.length) throw new Error('CSV header row is required.')
     return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] ?? ''])))
@@ -60,12 +60,14 @@ export default function CsvJsonConverterTool() {
     const [result, setResult] = useState('')
     const [language, setLanguage] = useState('json')
     const [error, setError] = useState('')
+    const [direction, setDirection] = useState('CSV to JSON')
+    const [delimiter, setDelimiter] = useState(',')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
     const convertCsvToJson = () => {
         try {
-            setResult(JSON.stringify(parseCsv(value), null, 4))
+            setResult(JSON.stringify(parseCsv(value, (delimiter || ',') === ',' && value.split(/\r?\n/)[0]?.includes(';') ? ';' : (delimiter || ',')), null, 4))
             setLanguage('json')
             setError('')
         } catch (err) {
@@ -83,6 +85,14 @@ export default function CsvJsonConverterTool() {
             setResult('')
             setError(`Invalid JSON: ${err.message}`)
         }
+    }
+
+    const convert = () => {
+        if (direction === 'JSON to CSV') {
+            convertJsonToCsv()
+            return
+        }
+        convertCsvToJson()
     }
 
     const openFile = async (file) => {
@@ -109,19 +119,25 @@ export default function CsvJsonConverterTool() {
             <Upload beforeUpload={openFile} showUploadList={false} accept=".csv,.json,.txt">
                 <Button icon={<FileUp size={16} />}>Open</Button>
             </Upload>
-            <Button icon={<FileSpreadsheet size={16} />} type="primary" onClick={convertCsvToJson}>CSV to JSON</Button>
-            <Button icon={<FileSpreadsheet size={16} />} onClick={convertJsonToCsv}>JSON to CSV</Button>
+            <Button icon={<FileSpreadsheet size={16} />} type="primary" onClick={convert}>Convert</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, language === 'json' ? 'converted.json' : 'converted.csv')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value, language])
+    ), [delimiter, direction, result, value, language])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page converter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Direction</span>
+                        <Radio.Group optionType="button" size="small" value={direction} onChange={(event) => setDirection(event.target.value)} options={[{ label: 'CSV to JSON', value: 'CSV to JSON' }, { label: 'JSON to CSV', value: 'JSON to CSV' }]} />
+                        <Input aria-label="Delimiter" size="small" value={delimiter} onChange={(event) => setDelimiter(event.target.value.slice(-1) || ',')} style={{ width: 54 }} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language={language} />}
             />

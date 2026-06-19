@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileUp, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -29,6 +29,7 @@ export default function Base64EncoderDecoderTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, base64Example))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [mode, setMode] = useState('Encode')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
@@ -45,6 +46,14 @@ export default function Base64EncoderDecoderTool() {
             setResult('')
             setError(`Invalid Base64: ${err.message}`)
         }
+    }
+
+    const run = () => {
+        if (mode === 'Decode') {
+            runDecode()
+            return
+        }
+        runEncode()
     }
 
     const openFile = async (file) => {
@@ -71,19 +80,24 @@ export default function Base64EncoderDecoderTool() {
             <Upload beforeUpload={openFile} showUploadList={false} accept=".txt,.b64">
                 <Button icon={<FileUp size={16} />}>Open</Button>
             </Upload>
-            <Button icon={<FileCode2 size={16} />} type="primary" onClick={runEncode}>Encode</Button>
-            <Button icon={<FileCode2 size={16} />} onClick={runDecode}>Decode</Button>
+            <Button icon={<FileCode2 size={16} />} type="primary" onClick={run}>Run</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'base64.txt')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value])
+    ), [mode, result, value])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page encoder-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Mode</span>
+                        <Radio.Group optionType="button" size="small" value={mode} onChange={(event) => setMode(event.target.value)} options={[{ label: 'Encode', value: 'Encode' }, { label: 'Decode', value: 'Decode' }]} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="encoder-error">{error}</pre> : <FormatterOutput code={result} language="text" />}
             />

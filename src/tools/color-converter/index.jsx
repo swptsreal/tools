@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message } from 'antd'
+import { Button, Input, message, Radio } from 'antd'
 import { Clipboard, Download, Palette, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -45,22 +45,28 @@ function rgbToHsl({ red, green, blue }) {
     }
 }
 
-function convertColor(input) {
+function convertColor(input, outputFormat = 'All') {
     const rgb = parseHex(input)
     const hsl = rgbToHsl(rgb)
-    return [`HEX: ${rgbToHex(rgb)}`, `RGB: rgb(${rgb.red}, ${rgb.green}, ${rgb.blue})`, `HSL: hsl(${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%)`].join('\n')
+    const lines = [
+        ['HEX', `HEX: ${rgbToHex(rgb)}`],
+        ['RGB', `RGB: rgb(${rgb.red}, ${rgb.green}, ${rgb.blue})`],
+        ['HSL', `HSL: hsl(${hsl.hue}, ${hsl.saturation}%, ${hsl.lightness}%)`]
+    ]
+    return lines.filter(([name]) => outputFormat === 'All' || outputFormat === name).map(([, line]) => line).join('\n')
 }
 
 export default function ColorConverterTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, colorExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [outputFormat, setOutputFormat] = useState('All')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
     const run = () => {
         try {
-            setResult(convertColor(value))
+            setResult(convertColor(value, outputFormat))
             setError('')
         } catch (err) {
             setResult('')
@@ -86,13 +92,19 @@ export default function ColorConverterTool() {
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'color-conversion.txt')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value])
+    ), [outputFormat, result, value])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page converter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Output</span>
+                        <Radio.Group optionType="button" size="small" value={outputFormat} onChange={(event) => setOutputFormat(event.target.value)} options={[{ label: 'All', value: 'All' }, { label: 'HEX', value: 'HEX' }, { label: 'RGB', value: 'RGB' }, { label: 'HSL', value: 'HSL' }]} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language="css" />}
             />

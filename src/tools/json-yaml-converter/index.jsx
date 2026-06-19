@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileJson, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -62,6 +62,7 @@ export default function JsonYamlConverterTool() {
     const [result, setResult] = useState('')
     const [language, setLanguage] = useState('yaml')
     const [error, setError] = useState('')
+    const [direction, setDirection] = useState('JSON to YAML')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
@@ -85,6 +86,14 @@ export default function JsonYamlConverterTool() {
             setResult('')
             setError(`Invalid YAML: ${err.message}`)
         }
+    }
+
+    const convert = () => {
+        if (direction === 'YAML to JSON') {
+            convertYamlToJson()
+            return
+        }
+        convertJsonToYaml()
     }
 
     const openFile = async (file) => {
@@ -111,19 +120,24 @@ export default function JsonYamlConverterTool() {
             <Upload beforeUpload={openFile} showUploadList={false} accept=".json,.yaml,.yml,.txt">
                 <Button icon={<FileUp size={16} />}>Open</Button>
             </Upload>
-            <Button icon={<FileJson size={16} />} type="primary" onClick={convertJsonToYaml}>JSON to YAML</Button>
-            <Button icon={<FileJson size={16} />} onClick={convertYamlToJson}>YAML to JSON</Button>
+            <Button icon={<FileJson size={16} />} type="primary" onClick={convert}>Convert</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, language === 'json' ? 'converted.json' : 'converted.yaml')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value, language])
+    ), [direction, result, value, language])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page converter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Direction</span>
+                        <Radio.Group optionType="button" size="small" value={direction} onChange={(event) => setDirection(event.target.value)} options={[{ label: 'JSON to YAML', value: 'JSON to YAML' }, { label: 'YAML to JSON', value: 'YAML to JSON' }]} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language={language} />}
             />

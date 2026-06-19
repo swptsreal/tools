@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message } from 'antd'
+import { Button, Input, message, Radio } from 'antd'
 import { CalendarClock, Clipboard, Download, RotateCcw, TimerReset } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -31,6 +31,8 @@ export default function TimestampConverterTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, timestampExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [direction, setDirection] = useState('Timestamp to Date')
+    const [unit, setUnit] = useState('Seconds')
 
     useEffect(() => saveDraft(toolId, value), [value])
 
@@ -42,6 +44,14 @@ export default function TimestampConverterTool() {
             setResult('')
             setError(err.message)
         }
+    }
+
+    const convert = () => {
+        if (direction === 'Date to Timestamp') {
+            run(dateToTimestamp)
+            return
+        }
+        run((input) => timestampToDate(input, unit))
     }
 
     const fillNow = () => {
@@ -63,20 +73,27 @@ export default function TimestampConverterTool() {
 
     const actions = useMemo(() => (
         <>
-            <Button icon={<CalendarClock size={16} />} type="primary" onClick={() => run(timestampToDate)}>Timestamp to Date</Button>
-            <Button icon={<CalendarClock size={16} />} onClick={() => run(dateToTimestamp)}>Date to Timestamp</Button>
+            <Button icon={<CalendarClock size={16} />} type="primary" onClick={convert}>Convert</Button>
             <Button icon={<TimerReset size={16} />} onClick={fillNow}>Now</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'timestamp-conversion.txt')}>Download</Button>
             <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
         </>
-    ), [result, value])
+    ), [direction, result, unit, value])
 
     useToolActions(actions)
 
     return (
         <div className="tool-page converter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Direction</span>
+                        <Radio.Group optionType="button" size="small" value={direction} onChange={(event) => setDirection(event.target.value)} options={[{ label: 'Timestamp to Date', value: 'Timestamp to Date' }, { label: 'Date to Timestamp', value: 'Date to Timestamp' }]} />
+                        <span className="tool-function-label">Unit</span>
+                        <Radio.Group optionType="button" size="small" value={unit} onChange={(event) => setUnit(event.target.value)} options={[{ label: 'Seconds', value: 'Seconds' }, { label: 'Milliseconds', value: 'Milliseconds' }]} />
+                    </>
+                )}
                 left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language="plain" />}
             />

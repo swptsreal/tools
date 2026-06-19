@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -16,6 +16,7 @@ const toolId = 'mermaid-preview'
 
 export default function MermaidPreviewTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, mermaidExample))
+    const [theme, setTheme] = useState('Default')
     const debouncedValue = useDebouncedValue(value, 300)
 
     useEffect(() => {
@@ -52,6 +53,12 @@ export default function MermaidPreviewTool() {
     return (
         <div className="tool-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Theme</span>
+                        <Radio.Group optionType="button" size="small" value={theme} onChange={(event) => setTheme(event.target.value)} options={[{ label: 'Default', value: 'Default' }, { label: 'Dark', value: 'Dark' }]} />
+                    </>
+                )}
                 left={
                     <Input.TextArea
                         className="tool-editor"

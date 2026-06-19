@@ -30,17 +30,19 @@ async function expectNoPageOverflow(page) {
 async function expectEditorFillsLeftPanel(page) {
     const layout = await page.evaluate(() => {
         const panel = document.querySelector('.split-left')?.getBoundingClientRect()
+        const toolbar = document.querySelector('.split-left .tool-function-bar')?.getBoundingClientRect()
         const editor = document.querySelector('.tool-editor')?.getBoundingClientRect()
 
         return {
             panelHeight: panel?.height ?? 0,
+            toolbarHeight: toolbar?.height ?? 0,
             editorHeight: editor?.height ?? 0,
             panelWidth: panel?.width ?? 0,
             editorWidth: editor?.width ?? 0
         }
     })
 
-    expect(layout.editorHeight).toBeGreaterThanOrEqual(layout.panelHeight - 2)
+    expect(layout.editorHeight + layout.toolbarHeight).toBeGreaterThanOrEqual(layout.panelHeight - 2)
     expect(layout.editorWidth).toBeGreaterThanOrEqual(layout.panelWidth - 2)
 }
 
@@ -140,7 +142,8 @@ test('shows converter tools in sidebar navigation', async ({ page }) => {
 test('converts JSON to YAML offline', async ({ page }) => {
     await page.goto('/tools/json-yaml-converter')
     await page.locator('textarea').fill('{"name":"Useful Tools","tags":["offline","converter"],"enabled":true}')
-    await page.getByRole('button', { name: 'JSON to YAML' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('JSON to YAML').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.locator('.fo-output')).toContainText('name: Useful Tools')
     await expect(page.locator('.fo-output')).toContainText('- offline')
 })
@@ -148,7 +151,8 @@ test('converts JSON to YAML offline', async ({ page }) => {
 test('converts YAML to JSON offline', async ({ page }) => {
     await page.goto('/tools/json-yaml-converter')
     await page.locator('textarea').fill('name: Useful Tools\nenabled: true\ncount: 3')
-    await page.getByRole('button', { name: 'YAML to JSON' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('YAML to JSON').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.locator('.fo-output')).toContainText('"enabled": true')
     await expect(page.locator('.fo-output')).toContainText('"count": 3')
 })
@@ -156,7 +160,8 @@ test('converts YAML to JSON offline', async ({ page }) => {
 test('converts CSV to JSON offline', async ({ page }) => {
     await page.goto('/tools/csv-json-converter')
     await page.locator('textarea').fill('name,count\nUseful Tools,4\nOffline,1')
-    await page.getByRole('button', { name: 'CSV to JSON' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('CSV to JSON').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.locator('.fo-output')).toContainText('"name": "Useful Tools"')
     await expect(page.locator('.fo-output')).toContainText('"count": "4"')
 })
@@ -164,7 +169,8 @@ test('converts CSV to JSON offline', async ({ page }) => {
 test('converts JSON array to CSV offline', async ({ page }) => {
     await page.goto('/tools/csv-json-converter')
     await page.locator('textarea').fill('[{"name":"Useful Tools","count":4},{"name":"Offline","count":1}]')
-    await page.getByRole('button', { name: 'JSON to CSV' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('JSON to CSV').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.locator('.fo-output')).toContainText('name,count')
     await expect(page.locator('.fo-output')).toContainText('Useful Tools,4')
 })
@@ -172,14 +178,16 @@ test('converts JSON array to CSV offline', async ({ page }) => {
 test('converts unix seconds to ISO date offline', async ({ page }) => {
     await page.goto('/tools/timestamp-converter')
     await page.locator('textarea').fill('1704067200')
-    await page.getByRole('button', { name: 'Timestamp to Date' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Timestamp to Date').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.locator('.fo-output')).toContainText('2024-01-01T00:00:00.000Z')
 })
 
 test('converts ISO date to unix timestamps offline', async ({ page }) => {
     await page.goto('/tools/timestamp-converter')
     await page.locator('textarea').fill('2024-01-01T00:00:00.000Z')
-    await page.getByRole('button', { name: 'Date to Timestamp' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Date to Timestamp').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.locator('.fo-output')).toContainText('Seconds: 1704067200')
     await expect(page.locator('.fo-output')).toContainText('Milliseconds: 1704067200000')
 })
@@ -465,12 +473,14 @@ test('encodes and decodes Base64 with Unicode text offline', async ({ page }) =>
     await expect(page.getByRole('heading', { name: 'Base64 Encoder Decoder' })).toBeVisible()
 
     await page.locator('textarea').fill('Hello Useful Tools — Xin chào')
-    await page.getByRole('button', { name: 'Encode' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Encode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
 
     await expect(page.locator('.fo-output')).toContainText('SGVsbG8gVXNlZnVsIFRvb2xzIOKAlCBYaW4gY2jDoG8=')
 
     await page.locator('textarea').fill('SGVsbG8gVXNlZnVsIFRvb2xzIOKAlCBYaW4gY2jDoG8=')
-    await page.getByRole('button', { name: 'Decode' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Decode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
 
     await expect(page.locator('.fo-output')).toContainText('Hello Useful Tools — Xin chào')
 })
@@ -481,12 +491,14 @@ test('encodes and decodes URL components offline', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'URL Encoder Decoder' })).toBeVisible()
 
     await page.locator('textarea').fill('https://example.test/search?q=hello tools&lang=vi')
-    await page.getByRole('button', { name: 'Encode' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Encode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
 
     await expect(page.locator('.fo-output')).toContainText('https%3A%2F%2Fexample.test%2Fsearch%3Fq%3Dhello%20tools%26lang%3Dvi')
 
     await page.locator('textarea').fill('https%3A%2F%2Fexample.test%2Fsearch%3Fq%3Dhello%20tools%26lang%3Dvi')
-    await page.getByRole('button', { name: 'Decode' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Decode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
 
     await expect(page.locator('.fo-output')).toContainText('https://example.test/search?q=hello tools&lang=vi')
 })
@@ -497,12 +509,14 @@ test('encodes and decodes HTML entities offline', async ({ page }) => {
     await expect(page.getByRole('heading', { name: 'HTML Entity Encoder Decoder' })).toBeVisible()
 
     await page.locator('textarea').fill('<p title="Useful & calm">Xin chào</p>')
-    await page.getByRole('button', { name: 'Encode' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Encode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
 
     await expect(page.locator('.fo-output')).toContainText('&lt;p title=&quot;Useful &amp; calm&quot;&gt;Xin chào&lt;/p&gt;')
 
     await page.locator('textarea').fill('&lt;p&gt;Useful &amp; offline&lt;/p&gt;')
-    await page.getByRole('button', { name: 'Decode' }).click()
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Decode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
 
     await expect(page.locator('.fo-output')).toContainText('<p>Useful & offline</p>')
 })
@@ -518,6 +532,130 @@ test('decodes JWT header and payload without verifying signatures', async ({ pag
     await expect(page.locator('.fo-output')).toContainText('"alg": "none"')
     await expect(page.locator('.fo-output')).toContainText('"name": "Useful Tools"')
     await expect(page.getByText('Signature is decoded, not verified.')).toBeVisible()
+})
+
+
+
+
+
+test('header actions do not repeat options from the function bar', async ({ page }) => {
+    const cases = [
+        { path: '/tools/base64-encoder-decoder', duplicates: ['Encode', 'Decode'] },
+        { path: '/tools/url-encoder-decoder', duplicates: ['Encode', 'Decode', 'Pretty Query'] },
+        { path: '/tools/html-entity-encoder-decoder', duplicates: ['Encode', 'Decode'] },
+        { path: '/tools/json-yaml-converter', duplicates: ['JSON to YAML', 'YAML to JSON'] },
+        { path: '/tools/csv-json-converter', duplicates: ['CSV to JSON', 'JSON to CSV'] },
+        { path: '/tools/timestamp-converter', duplicates: ['Timestamp to Date', 'Date to Timestamp'] }
+    ]
+
+    for (const item of cases) {
+        await page.goto(item.path)
+        const header = page.locator('.app-header')
+        for (const duplicate of item.duplicates) {
+            await expect(header.getByRole('button', { name: duplicate })).toHaveCount(0)
+        }
+    }
+})
+
+test('base64 options choose decode mode from the function bar', async ({ page }) => {
+    await page.goto('/tools/base64-encoder-decoder')
+    await page.locator('textarea').fill('VXNlZnVsIFRvb2xz')
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Decode').click()
+    await page.getByRole('button', { name: 'Run' }).click()
+    await expect(page.locator('.fo-output')).toContainText('Useful Tools')
+})
+
+test('url options decode plus signs as spaces when enabled', async ({ page }) => {
+    await page.goto('/tools/url-encoder-decoder')
+    await page.locator('textarea').fill('Useful+Tools')
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('Decode').click()
+    await page.getByLabel('Plus as space').check()
+    await page.getByRole('button', { name: 'Run' }).click()
+    await expect(page.locator('.fo-output')).toContainText('Useful Tools')
+})
+
+test('html entity options choose numeric entity encoding', async ({ page }) => {
+    await page.goto('/tools/html-entity-encoder-decoder')
+    await page.locator('textarea').fill('<div>Useful</div>')
+    await page.getByText('Numeric').click()
+    await page.getByRole('button', { name: 'Run' }).click()
+    await expect(page.locator('.fo-output')).toContainText('&#60;div&#62;Useful&#60;/div&#62;')
+})
+
+test('json formatter options sort keys and use selected spacing', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"b":1,"a":2}')
+    await page.getByLabel('Sort keys').check()
+    await page.getByText('2 spaces').click()
+    await page.getByRole('button', { name: 'Format' }).click()
+    await expect(page.locator('.fo-output')).toContainText('"a": 2')
+})
+
+test('sql formatter options change keyword case', async ({ page }) => {
+    await page.goto('/tools/sql-formatter')
+    await page.locator('textarea').fill('select * from users')
+    await page.getByText('lowercase').click()
+    await page.getByRole('button', { name: 'Format' }).click()
+    await expect(page.locator('.fo-output')).toContainText('select')
+    await expect(page.locator('.fo-output')).not.toContainText('SELECT')
+})
+
+test('json yaml converter options choose yaml to json', async ({ page }) => {
+    await page.goto('/tools/json-yaml-converter')
+    await page.locator('textarea').fill('name: Useful Tools')
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('YAML to JSON').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
+    await expect(page.locator('.fo-output')).toContainText('"name": "Useful Tools"')
+})
+
+test('csv json converter options use semicolon delimiter', async ({ page }) => {
+    await page.goto('/tools/csv-json-converter')
+    await page.locator('textarea').fill('name;type\nUseful Tools;offline')
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('CSV to JSON').click()
+    await page.getByLabel('Delimiter').fill(';')
+    await page.getByRole('button', { name: 'Convert' }).click()
+    await expect(page.locator('.fo-output')).toContainText('"type": "offline"')
+})
+
+test('timestamp converter options read milliseconds', async ({ page }) => {
+    await page.goto('/tools/timestamp-converter')
+    await page.locator('textarea').fill('1766100000000')
+    await page.getByText('Milliseconds').click()
+    await page.getByRole('button', { name: 'Convert' }).click()
+    await expect(page.locator('.fo-output')).toContainText('2025')
+})
+
+test('color converter options output only hsl', async ({ page }) => {
+    await page.goto('/tools/color-converter')
+    await page.locator('textarea').fill('#336699')
+    await page.getByRole('toolbar', { name: 'Input options' }).getByText('HSL').click()
+    await page.getByRole('button', { name: 'Convert Color' }).click()
+    await expect(page.locator('.fo-output')).toContainText('hsl')
+    await expect(page.locator('.fo-output')).not.toContainText('RGB:')
+})
+
+
+
+test('mermaid preview options switch theme', async ({ page }) => {
+    await page.goto('/tools/mermaid-preview')
+    const toolbar = page.getByRole('toolbar', { name: 'Input options' })
+    await toolbar.getByText('Dark').click()
+    await expect(toolbar.getByText('Dark')).toBeVisible()
+})
+
+test('markdown preview options show line breaks control', async ({ page }) => {
+    await page.goto('/tools/markdown-preview')
+    await page.getByLabel('Line breaks').check()
+    await expect(page.getByLabel('Line breaks')).toBeChecked()
+})
+
+test('jwt decoder options show payload only', async ({ page }) => {
+    await page.goto('/tools/jwt-decoder')
+    await page.getByText('Payload only').click()
+    await page.locator('textarea').fill('eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjMifQ.')
+    await page.getByRole('button', { name: 'Decode' }).click()
+    await expect(page.locator('.fo-output')).toContainText('"sub": "123"')
+    await expect(page.locator('.fo-output')).not.toContainText('"alg": "none"')
 })
 
 test('split left shows a tool-specific function bar above the editor', async ({ page }) => {

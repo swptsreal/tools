@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
 import { Braces, Clipboard, Download, FileUp, RotateCcw, Shrink } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -13,22 +13,33 @@ import './style.css'
 
 const toolId = 'json-formatter'
 
-function formatJson(value, spacing) {
-    return JSON.stringify(JSON.parse(value), null, spacing)
+function sortJsonKeys(value) {
+    if (Array.isArray(value)) return value.map(sortJsonKeys)
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortJsonKeys(value[key])]))
+    }
+    return value
+}
+
+function formatJson(value, spacing, sortKeys = false) {
+    const parsed = JSON.parse(value)
+    return JSON.stringify(sortKeys ? sortJsonKeys(parsed) : parsed, null, spacing)
 }
 
 export default function JsonFormatterTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, jsonExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [spacing, setSpacing] = useState(2)
+    const [sortKeys, setSortKeys] = useState(false)
 
     useEffect(() => {
         saveDraft(toolId, value)
     }, [value])
 
-    const run = (spacing) => {
+    const run = (selectedSpacing = spacing) => {
         try {
-            setResult(formatJson(value, spacing))
+            setResult(formatJson(value, selectedSpacing, sortKeys))
             setError('')
         } catch (err) {
             setResult('')
@@ -76,6 +87,13 @@ export default function JsonFormatterTool() {
     return (
         <div className="tool-page formatter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Indent</span>
+                        <Radio.Group optionType="button" size="small" value={spacing} onChange={(event) => setSpacing(event.target.value)} options={[{ label: '2 spaces', value: 2 }, { label: '4 spaces', value: 4 }]} />
+                        <Checkbox checked={sortKeys} onChange={(event) => setSortKeys(event.target.checked)}>Sort keys</Checkbox>
+                    </>
+                )}
                 left={
                     <Input.TextArea
                         className="tool-editor"

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Upload } from 'antd'
+import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, CodeXml, Download, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -17,6 +17,7 @@ export default function HtmlFormatterTool() {
     const [value, setValue] = useState(() => loadDraft(toolId, htmlExample))
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
+    const [indentSize, setIndentSize] = useState(2)
 
     useEffect(() => {
         saveDraft(toolId, value)
@@ -25,7 +26,7 @@ export default function HtmlFormatterTool() {
     const formatHtml = async () => {
         try {
             const beautify = await import('js-beautify')
-            setResult(beautify.html(value, { indent_size: 2, wrap_line_length: 120 }))
+            setResult(beautify.html(value, { indent_size: indentSize, wrap_line_length: 120 }))
             setError('')
         } catch (err) {
             setResult('')
@@ -64,7 +65,7 @@ export default function HtmlFormatterTool() {
                 <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
             </>
         ),
-        [result, value]
+        [indentSize, result, value]
     )
 
     useToolActions(actions)
@@ -72,6 +73,12 @@ export default function HtmlFormatterTool() {
     return (
         <div className="tool-page formatter-page">
             <SplitWorkspace
+                leftToolbar={(
+                    <>
+                        <span className="tool-function-label">Indent</span>
+                        <Radio.Group optionType="button" size="small" value={indentSize} onChange={(event) => setIndentSize(event.target.value)} options={[{ label: '2 spaces', value: 2 }, { label: '4 spaces', value: 4 }]} />
+                    </>
+                )}
                 left={
                     <Input.TextArea
                         className="tool-editor"

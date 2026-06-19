@@ -4,11 +4,13 @@ import {
     ArrowDownAZ,
     Binary,
     Braces,
+    Clock3,
     CalendarClock,
     CodeXml,
     BadgePlus,
     Database,
     FileCode2,
+    FileType,
     FileJson,
     FileSpreadsheet,
     FileText,
@@ -19,11 +21,45 @@ import {
     Link,
     ListMinus,
     Palette,
+    Regex,
     ShieldCheck,
     Workflow
 } from 'lucide-react'
 
 export const tools = [
+
+    {
+        id: 'regex-tester',
+        name: 'Regex Tester',
+        group: 'Developer',
+        description: 'Test regex matches, groups, flags, and replacement previews offline.',
+        icon: Regex,
+        Component: lazy(() => import('./regex-tester/index.jsx'))
+    },
+    {
+        id: 'cron-expression-helper',
+        name: 'Cron Expression Helper',
+        group: 'Developer',
+        description: 'Explain cron expressions and preview upcoming run times offline.',
+        icon: Clock3,
+        Component: lazy(() => import('./cron-expression-helper/index.jsx'))
+    },
+    {
+        id: 'mime-type-lookup',
+        name: 'MIME Type Lookup',
+        group: 'Developer',
+        description: 'Look up file extensions and MIME types offline.',
+        icon: FileType,
+        Component: lazy(() => import('./mime-type-lookup/index.jsx'))
+    },
+    {
+        id: 'url-parser',
+        name: 'URL Parser',
+        group: 'Developer',
+        description: 'Parse URL parts, query params, and rebuilt output offline.',
+        icon: Link,
+        Component: lazy(() => import('./url-parser/index.jsx'))
+    },
     {
         id: 'json-formatter',
         name: 'JSON Formatter',

@@ -760,8 +760,8 @@ test('generates configurable passwords offline', async ({ page }) => {
     await page.getByLabel('Include symbols').check()
     await page.getByRole('main').getByRole('button', { name: 'Generate Password' }).click()
 
-    await expect.poll(async () => (await page.locator('.fo-output').textContent()).trim()).toHaveLength(24)
-    const password = (await page.locator('.fo-output').textContent()).trim()
+    await expect.poll(async () => (await page.locator('.fo-code').textContent()).trim()).toHaveLength(24)
+    const password = (await page.locator('.fo-code').textContent()).trim()
     expect(password).toMatch(/[A-Z]/)
     expect(password).toMatch(/[a-z]/)
     expect(password).toMatch(/[0-9]/)
@@ -907,3 +907,61 @@ for (const viewport of [
         }
     })
 }
+
+
+test('regex tester highlights matches and previews replacement', async ({ page }) => {
+    await page.goto('/tools/regex-tester')
+
+    await expect(page.getByRole('heading', { name: 'Regex Tester' })).toBeVisible()
+    await page.getByLabel('Pattern').fill('(user)@(example)\\.com')
+    await page.getByLabel('Flags').fill('gi')
+    await page.getByLabel('Replacement').fill('$1@test.dev')
+    await page.locator('textarea').fill('user@example.com\nUSER@example.com')
+    await page.getByRole('button', { name: 'Test Regex' }).click()
+
+    await expect(page.getByText('2 matches')).toBeVisible()
+    await expect(page.getByText('Group 1: user', { exact: true })).toBeVisible()
+    await expect(page.getByText('user@test.dev')).toBeVisible()
+})
+
+test('cron expression helper explains schedule and lists next runs', async ({ page }) => {
+    await page.goto('/tools/cron-expression-helper')
+
+    await expect(page.getByRole('heading', { name: 'Cron Expression Helper' })).toBeVisible()
+    await page.getByLabel('Cron expression').fill('*/15 9-17 * * 1-5')
+    await page.getByRole('button', { name: 'Explain Cron' }).click()
+
+    await expect(page.getByText('Every 15 minutes')).toBeVisible()
+    await expect(page.getByText('09:00 through 17:59')).toBeVisible()
+    await expect(page.getByText('Monday through Friday')).toBeVisible()
+    await expect(page.getByTestId('cron-next-runs').locator('li')).toHaveCount(10)
+})
+
+test('mime type lookup finds extensions and media types offline', async ({ page }) => {
+    await page.goto('/tools/mime-type-lookup')
+
+    await expect(page.getByRole('heading', { name: 'MIME Type Lookup' })).toBeVisible()
+    await page.getByLabel('Search MIME').fill('json')
+
+    await expect(page.getByText('.json')).toBeVisible()
+    await expect(page.getByText('application/json')).toBeVisible()
+    await expect(page.getByText('JavaScript Object Notation')).toBeVisible()
+})
+
+test('url parser splits and rebuilds URLs', async ({ page }) => {
+    await page.goto('/tools/url-parser')
+
+    await expect(page.getByRole('heading', { name: 'URL Parser' })).toBeVisible()
+    await page.locator('textarea').fill('https://example.com:8080/docs?q=tools&lang=vi#intro')
+    await page.getByRole('button', { name: 'Parse URL' }).click()
+
+    await expect(page.getByText('Protocol')).toBeVisible()
+    await expect(page.getByText('https:', { exact: true })).toBeVisible()
+    await expect(page.getByText('example.com', { exact: true })).toBeVisible()
+    await expect(page.getByText('8080', { exact: true })).toBeVisible()
+    await expect(page.getByText('/docs', { exact: true })).toBeVisible()
+    await expect(page.getByText('q = tools')).toBeVisible()
+    await expect(page.getByText('lang = vi')).toBeVisible()
+    await expect(page.getByText('#intro', { exact: true })).toBeVisible()
+    await expect(page.locator('.split-right').getByText('https://example.com:8080/docs?q=tools&lang=vi#intro')).toBeVisible()
+})

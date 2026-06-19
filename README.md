@@ -73,6 +73,13 @@ Tác dụng:
 - Preview bảng, code block, heading, list.
 - Hỗ trợ Mermaid block trong Markdown.
 
+### Formatter
+
+- JSON Formatter
+- SQL Formatter
+- HTML Formatter
+- CSS Formatter
+
 ### Converter
 
 - JSON YAML Converter: đổi JSON sang YAML và YAML đơn giản sang JSON.
@@ -87,15 +94,6 @@ Tác dụng:
 - HTML Entity Encoder Decoder: mã hóa và giải mã HTML entities.
 - JWT Decoder: đọc header/payload JWT offline, không xác minh chữ ký.
 
-## Tools Sẽ Có
-
-### Formatter
-
-- JSON Formatter
-- SQL Formatter
-- HTML Formatter
-- CSS Formatter
-
 ### Generator
 
 - Hash Generator: tạo SHA-1, SHA-256, SHA-384 và SHA-512 từ text.
@@ -103,6 +101,8 @@ Tác dụng:
 - Password Generator: tạo mật khẩu theo độ dài và nhóm ký tự đã chọn.
 - JWT Secret Generator: tạo secret base64url để dùng cho JWT signing.
 - Fake Data Generator: tạo JSON records giả để dùng thử UI, demo hoặc test thủ công.
+
+## Tools Sẽ Có
 
 ### Text Tools
 

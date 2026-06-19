@@ -560,6 +560,31 @@ test('decodes JWT header and payload without verifying signatures', async ({ pag
 
 
 
+
+test('wraps long formatter output tokens without horizontal overflow', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/tools/jwt-decoder')
+
+    const toBase64Url = (value) => btoa(value).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
+    const token = [
+        toBase64Url('{"alg":"HS256","typ":"JWT"}'),
+        toBase64Url('{"sub":"1234567890","name":"Useful Tools"}'),
+        's'.repeat(360),
+    ].join('.')
+    await page.locator('textarea').fill(token)
+    await page.getByRole('button', { name: 'Decode' }).click()
+
+    const outputWrap = page.locator('.formatter-output-wrap')
+    await expect(outputWrap).toContainText('s'.repeat(120))
+
+    const metrics = await outputWrap.evaluate((node) => ({
+        clientWidth: node.clientWidth,
+        scrollWidth: node.scrollWidth,
+    }))
+
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1)
+})
+
 test('header actions do not repeat options from the function bar', async ({ page }) => {
     const cases = [
         { path: '/tools/base64-encoder-decoder', duplicates: ['Encode', 'Decode'] },

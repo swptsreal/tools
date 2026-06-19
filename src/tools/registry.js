@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Braces, CodeXml, Database, FileText, Palette, Workflow } from 'lucide-react'
+import { Braces, CalendarClock, CodeXml, Database, FileJson, FileSpreadsheet, FileText, Palette, Workflow } from 'lucide-react'
 
 export const tools = [
     {
@@ -49,5 +49,37 @@ export const tools = [
         description: 'Format CSS stylesheets offline.',
         icon: Palette,
         Component: lazy(() => import('./css-formatter/index.jsx'))
+    },
+    {
+        id: 'json-yaml-converter',
+        name: 'JSON YAML Converter',
+        group: 'Converter',
+        description: 'Convert JSON and YAML offline.',
+        icon: FileJson,
+        Component: lazy(() => import('./json-yaml-converter/index.jsx'))
+    },
+    {
+        id: 'csv-json-converter',
+        name: 'CSV JSON Converter',
+        group: 'Converter',
+        description: 'Convert CSV and JSON arrays offline.',
+        icon: FileSpreadsheet,
+        Component: lazy(() => import('./csv-json-converter/index.jsx'))
+    },
+    {
+        id: 'timestamp-converter',
+        name: 'Timestamp Converter',
+        group: 'Converter',
+        description: 'Convert Unix timestamps and dates offline.',
+        icon: CalendarClock,
+        Component: lazy(() => import('./timestamp-converter/index.jsx'))
+    },
+    {
+        id: 'color-converter',
+        name: 'Color Converter',
+        group: 'Converter',
+        description: 'Convert HEX, RGB, HSL, and HSV colors offline.',
+        icon: Palette,
+        Component: lazy(() => import('./color-converter/index.jsx'))
     }
 ]

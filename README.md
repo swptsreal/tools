@@ -72,6 +72,13 @@ Tác dụng:
 - Preview bảng, code block, heading, list.
 - Hỗ trợ Mermaid block trong Markdown.
 
+### Converter
+
+- JSON YAML Converter: đổi JSON sang YAML và YAML đơn giản sang JSON.
+- CSV JSON Converter: đổi CSV sang JSON array và JSON array sang CSV.
+- Timestamp Converter: đổi Unix timestamp sang ngày giờ và ngược lại.
+- Color Converter: đổi HEX sang RGB và HSL.
+
 ## Tools Sẽ Có
 
 ### Formatter
@@ -81,19 +88,13 @@ Tác dụng:
 - HTML Formatter
 - CSS Formatter
 
-### Converter
-
-- JSON ↔ YAML
-- CSV ↔ JSON
-- Timestamp Converter
-- Color Converter
-
 ### Encoder / Decoder
 
 - Base64 Encode/Decode
 - URL Encode/Decode
 - HTML Entity Encode/Decode
 - JWT Decode offline
+- JWT Secret Generator
 
 ### Generator
 

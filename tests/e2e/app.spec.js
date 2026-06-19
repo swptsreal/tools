@@ -126,6 +126,73 @@ test('formats CSS offline', async ({ page }) => {
     await expect(page.locator('.fo-output')).toContainText('display: flex;')
 })
 
+
+test('shows converter tools in sidebar navigation', async ({ page }) => {
+    await page.goto('/tools/json-yaml-converter')
+
+    await expect(page.locator('.desktop-sidebar h2', { hasText: 'Converter' })).toBeVisible()
+    await expect(page.getByRole('link', { name: /JSON YAML Converter/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: /CSV JSON Converter/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Timestamp Converter/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Color Converter/ })).toBeVisible()
+})
+
+test('converts JSON to YAML offline', async ({ page }) => {
+    await page.goto('/tools/json-yaml-converter')
+    await page.locator('textarea').fill('{"name":"Useful Tools","tags":["offline","converter"],"enabled":true}')
+    await page.getByRole('button', { name: 'JSON to YAML' }).click()
+    await expect(page.locator('.fo-output')).toContainText('name: Useful Tools')
+    await expect(page.locator('.fo-output')).toContainText('- offline')
+})
+
+test('converts YAML to JSON offline', async ({ page }) => {
+    await page.goto('/tools/json-yaml-converter')
+    await page.locator('textarea').fill('name: Useful Tools\nenabled: true\ncount: 3')
+    await page.getByRole('button', { name: 'YAML to JSON' }).click()
+    await expect(page.locator('.fo-output')).toContainText('"enabled": true')
+    await expect(page.locator('.fo-output')).toContainText('"count": 3')
+})
+
+test('converts CSV to JSON offline', async ({ page }) => {
+    await page.goto('/tools/csv-json-converter')
+    await page.locator('textarea').fill('name,count\nUseful Tools,4\nOffline,1')
+    await page.getByRole('button', { name: 'CSV to JSON' }).click()
+    await expect(page.locator('.fo-output')).toContainText('"name": "Useful Tools"')
+    await expect(page.locator('.fo-output')).toContainText('"count": "4"')
+})
+
+test('converts JSON array to CSV offline', async ({ page }) => {
+    await page.goto('/tools/csv-json-converter')
+    await page.locator('textarea').fill('[{"name":"Useful Tools","count":4},{"name":"Offline","count":1}]')
+    await page.getByRole('button', { name: 'JSON to CSV' }).click()
+    await expect(page.locator('.fo-output')).toContainText('name,count')
+    await expect(page.locator('.fo-output')).toContainText('Useful Tools,4')
+})
+
+test('converts unix seconds to ISO date offline', async ({ page }) => {
+    await page.goto('/tools/timestamp-converter')
+    await page.locator('textarea').fill('1704067200')
+    await page.getByRole('button', { name: 'Timestamp to Date' }).click()
+    await expect(page.locator('.fo-output')).toContainText('2024-01-01T00:00:00.000Z')
+})
+
+test('converts ISO date to unix timestamps offline', async ({ page }) => {
+    await page.goto('/tools/timestamp-converter')
+    await page.locator('textarea').fill('2024-01-01T00:00:00.000Z')
+    await page.getByRole('button', { name: 'Date to Timestamp' }).click()
+    await expect(page.locator('.fo-output')).toContainText('Seconds: 1704067200')
+    await expect(page.locator('.fo-output')).toContainText('Milliseconds: 1704067200000')
+})
+
+test('converts hex color to rgb and hsl offline', async ({ page }) => {
+    await page.goto('/tools/color-converter')
+    await page.locator('textarea').fill('#336699')
+    await page.getByRole('button', { name: 'Convert Color' }).click()
+    await expect(page.locator('.fo-output')).toContainText('HEX: #336699')
+    await expect(page.locator('.fo-output')).toContainText('RGB: rgb(51, 102, 153)')
+    await expect(page.locator('.fo-output')).toContainText('HSL: hsl(210, 50%, 40%)')
+})
+
 test('debounces preview rendering while editing markdown textarea', async ({ page }) => {
     await page.clock.install({ time: new Date('2026-06-18T12:00:00') })
     await page.goto('/tools/markdown-preview')
@@ -296,7 +363,11 @@ for (const viewport of breakpoints) {
             '/tools/json-formatter',
             '/tools/sql-formatter',
             '/tools/html-formatter',
-            '/tools/css-formatter'
+            '/tools/css-formatter',
+            '/tools/json-yaml-converter',
+            '/tools/csv-json-converter',
+            '/tools/timestamp-converter',
+            '/tools/color-converter'
         ]) {
             await page.goto(path)
 

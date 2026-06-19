@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Braces, CalendarClock, CodeXml, Database, FileJson, FileSpreadsheet, FileText, Palette, Workflow } from 'lucide-react'
+import { Binary, Braces, CalendarClock, CodeXml, Database, FileCode2, FileJson, FileSpreadsheet, FileText, Fingerprint, KeyRound, Link, Palette, Workflow } from 'lucide-react'
 
 export const tools = [
     {
@@ -81,5 +81,45 @@ export const tools = [
         description: 'Convert HEX, RGB, HSL, and HSV colors offline.',
         icon: Palette,
         Component: lazy(() => import('./color-converter/index.jsx'))
+    },
+    {
+        id: 'base64-encoder-decoder',
+        name: 'Base64 Encoder Decoder',
+        group: 'Encoder / Decoder',
+        description: 'Encode and decode Base64 text offline.',
+        icon: Binary,
+        Component: lazy(() => import('./base64-encoder-decoder/index.jsx'))
+    },
+    {
+        id: 'url-encoder-decoder',
+        name: 'URL Encoder Decoder',
+        group: 'Encoder / Decoder',
+        description: 'Encode, decode, and inspect URL query strings offline.',
+        icon: Link,
+        Component: lazy(() => import('./url-encoder-decoder/index.jsx'))
+    },
+    {
+        id: 'html-entity-encoder-decoder',
+        name: 'HTML Entity Encoder Decoder',
+        group: 'Encoder / Decoder',
+        description: 'Encode and decode HTML entities offline.',
+        icon: FileCode2,
+        Component: lazy(() => import('./html-entity-encoder-decoder/index.jsx'))
+    },
+    {
+        id: 'jwt-decoder',
+        name: 'JWT Decoder',
+        group: 'Encoder / Decoder',
+        description: 'Decode JWT headers and payloads offline without signature verification.',
+        icon: KeyRound,
+        Component: lazy(() => import('./jwt-decoder/index.jsx'))
+    },
+    {
+        id: 'hash-generator',
+        name: 'Hash Generator',
+        group: 'Encoder / Decoder',
+        description: 'Generate SHA hashes for text offline.',
+        icon: Fingerprint,
+        Component: lazy(() => import('./hash-generator/index.jsx'))
     }
 ]

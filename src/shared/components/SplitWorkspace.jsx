@@ -19,7 +19,7 @@ function useVerticalSplitter() {
     return isVertical
 }
 
-export function SplitWorkspace({ left, right }) {
+export function SplitWorkspace({ left, leftToolbar, right }) {
     const isVertical = useVerticalSplitter()
 
     return (
@@ -32,7 +32,12 @@ export function SplitWorkspace({ left, right }) {
                 defaultSize={isVertical ? '45%' : '42%'}
                 min={isVertical ? 220 : 280}
             >
-                {left}
+                {leftToolbar ? (
+                    <div className="tool-function-bar" role="toolbar" aria-label="Input options">
+                        {leftToolbar}
+                    </div>
+                ) : null}
+                <div className="tool-input-area">{left}</div>
             </Splitter.Panel>
             <Splitter.Panel className="split-panel split-right" min={240}>
                 {right}

@@ -1,0 +1,1 @@
+export const jwtExample = 'eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjMiLCJuYW1lIjoiVXNlZnVsIFRvb2xzIiwiaWF0IjoxNzY2MTAwMDAwfQ.'

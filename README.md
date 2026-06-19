@@ -79,6 +79,14 @@ Tác dụng:
 - Timestamp Converter: đổi Unix timestamp sang ngày giờ và ngược lại.
 - Color Converter: đổi HEX sang RGB và HSL.
 
+### Encoder / Decoder
+
+- Base64 Encoder Decoder: mã hóa và giải mã Base64, hỗ trợ Unicode.
+- URL Encoder Decoder: mã hóa, giải mã URL và xem nhanh query string.
+- HTML Entity Encoder Decoder: mã hóa và giải mã HTML entities.
+- JWT Decoder: đọc header/payload JWT offline, không xác minh chữ ký.
+- Hash Generator: tạo SHA-1, SHA-256, SHA-384 và SHA-512 từ text.
+
 ## Tools Sẽ Có
 
 ### Formatter
@@ -90,17 +98,12 @@ Tác dụng:
 
 ### Encoder / Decoder
 
-- Base64 Encode/Decode
-- URL Encode/Decode
-- HTML Entity Encode/Decode
-- JWT Decode offline
 - JWT Secret Generator
 
 ### Generator
 
 - UUID Generator
 - Password Generator
-- Hash Generator
 - Fake Data Generator
 
 ### Text Tools

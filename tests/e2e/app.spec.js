@@ -437,3 +437,116 @@ test('formatter output renders syntax-highlighted tokens', async ({ page }) => {
 
 
 
+
+
+const encoderDecoderRoutes = [
+    { path: '/tools/base64-encoder-decoder', heading: 'Base64 Encoder Decoder' },
+    { path: '/tools/url-encoder-decoder', heading: 'URL Encoder Decoder' },
+    { path: '/tools/html-entity-encoder-decoder', heading: 'HTML Entity Encoder Decoder' },
+    { path: '/tools/jwt-decoder', heading: 'JWT Decoder' },
+    { path: '/tools/hash-generator', heading: 'Hash Generator' }
+]
+
+for (const route of encoderDecoderRoutes) {
+    for (const breakpoint of breakpoints) {
+        test(`${route.heading} has no page overflow at ${breakpoint.name}`, async ({ page }) => {
+            await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height })
+            await page.goto(route.path)
+
+            await expect(page.getByRole('heading', { name: route.heading })).toBeVisible()
+            await expectNoPageOverflow(page)
+        })
+    }
+}
+
+test('encodes and decodes Base64 with Unicode text offline', async ({ page }) => {
+    await page.goto('/tools/base64-encoder-decoder')
+
+    await expect(page.getByRole('heading', { name: 'Base64 Encoder Decoder' })).toBeVisible()
+
+    await page.locator('textarea').fill('Hello Useful Tools — Xin chào')
+    await page.getByRole('button', { name: 'Encode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('SGVsbG8gVXNlZnVsIFRvb2xzIOKAlCBYaW4gY2jDoG8=')
+
+    await page.locator('textarea').fill('SGVsbG8gVXNlZnVsIFRvb2xzIOKAlCBYaW4gY2jDoG8=')
+    await page.getByRole('button', { name: 'Decode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('Hello Useful Tools — Xin chào')
+})
+
+test('encodes and decodes URL components offline', async ({ page }) => {
+    await page.goto('/tools/url-encoder-decoder')
+
+    await expect(page.getByRole('heading', { name: 'URL Encoder Decoder' })).toBeVisible()
+
+    await page.locator('textarea').fill('https://example.test/search?q=hello tools&lang=vi')
+    await page.getByRole('button', { name: 'Encode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('https%3A%2F%2Fexample.test%2Fsearch%3Fq%3Dhello%20tools%26lang%3Dvi')
+
+    await page.locator('textarea').fill('https%3A%2F%2Fexample.test%2Fsearch%3Fq%3Dhello%20tools%26lang%3Dvi')
+    await page.getByRole('button', { name: 'Decode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('https://example.test/search?q=hello tools&lang=vi')
+})
+
+test('encodes and decodes HTML entities offline', async ({ page }) => {
+    await page.goto('/tools/html-entity-encoder-decoder')
+
+    await expect(page.getByRole('heading', { name: 'HTML Entity Encoder Decoder' })).toBeVisible()
+
+    await page.locator('textarea').fill('<p title="Useful & calm">Xin chào</p>')
+    await page.getByRole('button', { name: 'Encode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('&lt;p title=&quot;Useful &amp; calm&quot;&gt;Xin chào&lt;/p&gt;')
+
+    await page.locator('textarea').fill('&lt;p&gt;Useful &amp; offline&lt;/p&gt;')
+    await page.getByRole('button', { name: 'Decode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('<p>Useful & offline</p>')
+})
+
+test('decodes JWT header and payload without verifying signatures', async ({ page }) => {
+    await page.goto('/tools/jwt-decoder')
+
+    await expect(page.getByRole('heading', { name: 'JWT Decoder' })).toBeVisible()
+
+    await page.locator('textarea').fill('eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjMiLCJuYW1lIjoiVXNlZnVsIFRvb2xzIiwiaWF0IjoxNzY2MTAwMDAwfQ.')
+    await page.getByRole('button', { name: 'Decode' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('"alg": "none"')
+    await expect(page.locator('.fo-output')).toContainText('"name": "Useful Tools"')
+    await expect(page.getByText('Signature is decoded, not verified.')).toBeVisible()
+})
+
+test('split left shows a tool-specific function bar above the editor', async ({ page }) => {
+    await page.goto('/tools/hash-generator')
+
+    const leftPanel = page.locator('.split-left')
+    const functionBar = leftPanel.getByRole('toolbar', { name: 'Input options' })
+    await expect(functionBar).toBeVisible()
+    await expect(functionBar.getByText('Hash algorithm')).toBeVisible()
+    await expect(functionBar.getByText('SHA-256')).toBeVisible()
+
+    const positions = await page.evaluate(() => {
+        const bar = document.querySelector('.split-left .tool-function-bar')?.getBoundingClientRect()
+        const editor = document.querySelector('.split-left .tool-editor')?.getBoundingClientRect()
+        return { barBottom: bar?.bottom ?? 0, editorTop: editor?.top ?? 0 }
+    })
+
+    expect(positions.barBottom).toBeLessThanOrEqual(positions.editorTop)
+})
+
+test('generates SHA digests offline', async ({ page }) => {
+    await page.goto('/tools/hash-generator')
+
+    await expect(page.getByRole('heading', { name: 'Hash Generator' })).toBeVisible()
+
+    await page.locator('textarea').fill('Useful Tools')
+    await page.getByText('SHA-512').click()
+    await page.getByRole('button', { name: 'Generate Hashes' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('SHA-512')
+    await expect(page.locator('.fo-output')).not.toContainText('SHA-256')
+})

@@ -47,8 +47,32 @@
 }
 
 .split-left {
+    display: flex;
+    flex-direction: column;
     border-right: 1px solid #e5e7eb;
     background: #ffffff;
+}
+
+.tool-function-bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.tool-function-label {
+    color: #4b5563;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.tool-input-area {
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .split-right {

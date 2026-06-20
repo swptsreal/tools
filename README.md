@@ -73,12 +73,20 @@ Tác dụng:
 - Preview bảng, code block, heading, list.
 - Hỗ trợ Mermaid block trong Markdown.
 
+### Preview
+
+- Mermaid Preview
+- Markdown Preview
+- YAML Preview: xem OpenAPI bằng Swagger UI hoặc cây YAML thường offline.
+
 ### Formatter
 
 - JSON Formatter
 - SQL Formatter
 - HTML Formatter
 - CSS Formatter
+- XML Formatter
+- JSON Compare
 
 ### Converter
 
@@ -116,42 +124,21 @@ Tác dụng:
 - Cron Expression Helper: giải thích cron expression và preview các lần chạy tiếp theo.
 - MIME Type Lookup: tra extension ↔ MIME type và copy header mẫu.
 - URL Parser: tách protocol, host, path, query params, hash và rebuild URL.
-
-## Tools Sẽ Có
-
-### Developer Tools
-
 - Unit Converter: đổi length, weight, temperature, storage, speed, area và volume.
-- JSON Path Tester: nhập JSON + JSONPath để xem kết quả match.
-- HTTP Status Codes: tra status code, ý nghĩa và nhóm lỗi/thành công.
-- IP/Subnet Calculator: tính CIDR, netmask, range, wildcard và usable hosts.
 - Number Base Converter: đổi binary, decimal, hex, octal và ASCII view.
 - Escape / Unescape: escape JSON string, JavaScript string, regex và shell text.
 
-### Data Tools
-
-- YAML Formatter: format, minify và validate YAML offline.
-- XML Formatter: format, minify và validate XML offline.
-- CSV Cleaner: trim cells, bỏ dòng rỗng, chuẩn hóa delimiter và preview bảng.
-- Table Converter: chuyển CSV, TSV, JSON array và Markdown table qua lại.
-- JSON Schema Validator: validate JSON theo schema nhập cục bộ.
-- JSON Compare: so sánh 2 object JSON và hiển thị field thêm/xóa/thay đổi.
+## Tools Sẽ Có
 
 ### Security / Identity Tools
 
-- JWT Builder: tạo JWT mock từ header + payload, tùy chọn ký bằng secret local.
 - QR Code Generator: tạo QR từ text, URL hoặc WiFi config và tải PNG/SVG.
-- UUID Inspector: nhận diện UUID version, variant và timestamp nếu có.
 - TOTP Generator: tạo mã OTP từ secret local để test luồng 2FA.
-- Random Token Generator: tạo token hex, base64url hoặc alphanumeric theo độ dài.
 
-### Content Tools
+### Text
 
-- Slug Generator: tạo slug từ tiêu đề, chọn separator và bỏ dấu tiếng Việt.
 - Lorem Ipsum Generator: tạo words, sentences hoặc paragraphs theo số lượng.
-- Reading Time Calculator: tính số từ và thời gian đọc ước tính.
 - Text Extractor: lấy emails, URLs, phone numbers hoặc numbers từ văn bản.
-- Markdown Table Builder: nhập dữ liệu bảng và xuất Markdown table.
 
 ## Nguyên Tắc Hoạt Động
 

@@ -1,0 +1,156 @@
+.yaml-preview-page {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.yaml-preview-options {
+    margin-bottom: 0.75rem;
+}
+
+.yaml-auto-preview-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.yaml-auto-preview-toggle input {
+    accent-color: #1677ff;
+}
+
+.yaml-preview-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 38%) minmax(0, 1fr);
+    gap: 0.85rem;
+    min-height: 0;
+    height: 100%;
+}
+
+.yaml-editor-panel,
+.yaml-preview-output {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.yaml-editor-panel .tool-editor {
+    height: 100%;
+    border: 0;
+    border-radius: 16px;
+    resize: none;
+}
+
+.yaml-preview-output {
+    overflow: auto;
+}
+
+.yaml-swagger-preview,
+.yaml-tree-preview {
+    min-width: 0;
+    min-height: 100%;
+    overflow: auto;
+    overflow-wrap: anywhere;
+}
+
+.yaml-tree-preview {
+    padding: 1rem;
+    color: var(--text-color, #172033);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.9rem;
+}
+
+.yaml-muted {
+    color: #64748b;
+}
+
+.yaml-tree-node,
+.yaml-tree-leaf {
+    margin: 0.35rem 0;
+    padding: 0.45rem 0.6rem;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.yaml-tree-node summary {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.yaml-tree-children {
+    border-left: 2px solid #e2e8f0;
+    margin: 0.45rem 0 0.15rem 0.25rem;
+    padding-left: 0.75rem;
+}
+
+.yaml-tree-key {
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.yaml-tree-value {
+    color: #0f172a;
+}
+
+.yaml-swagger-preview .swagger-ui {
+    min-width: 0;
+    padding: 0.75rem;
+    font-family: inherit;
+}
+
+.yaml-swagger-preview .swagger-ui .wrapper,
+.yaml-swagger-preview .swagger-ui .information-container.wrapper,
+.yaml-swagger-preview .swagger-ui .scheme-container .schemes.wrapper,
+.yaml-swagger-preview .swagger-ui .opblock-tag-section,
+.yaml-swagger-preview .swagger-ui .models {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.yaml-swagger-preview .swagger-ui .scheme-container {
+    padding: 0.75rem;
+    box-shadow: none;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 12px;
+}
+
+.yaml-swagger-preview .swagger-ui table,
+.yaml-swagger-preview .swagger-ui .responses-inner,
+.yaml-swagger-preview .swagger-ui .opblock-body,
+.yaml-swagger-preview .swagger-ui .model-box,
+.yaml-swagger-preview .swagger-ui .highlight-code,
+.yaml-swagger-preview .swagger-ui .microlight {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+@media (max-width: 1000px) {
+    .yaml-preview-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(260px, 42vh) minmax(320px, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .yaml-preview-page {
+        overflow: auto;
+    }
+
+    .yaml-preview-layout {
+        height: auto;
+        grid-template-rows: 320px minmax(420px, auto);
+    }
+
+    .yaml-swagger-preview .swagger-ui,
+    .yaml-tree-preview {
+        padding: 0.6rem;
+    }
+}

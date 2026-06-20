@@ -475,6 +475,25 @@ for (const route of [...encoderDecoderRoutes, ...generatorRoutes]) {
 }
 
 
+const phaseTwoFormatterRoutes = [
+    { path: '/tools/yaml-preview', heading: 'YAML Preview' },
+    { path: '/tools/xml-formatter', heading: 'XML Formatter' },
+    { path: '/tools/json-compare', heading: 'JSON Compare' }
+]
+
+for (const route of phaseTwoFormatterRoutes) {
+    for (const breakpoint of breakpoints) {
+        test(`${route.heading} has no page overflow at ${breakpoint.name}`, async ({ page }) => {
+            await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height })
+            await page.goto(route.path)
+
+            await expect(page.getByRole('heading', { name: route.heading })).toBeVisible()
+            await expectNoPageOverflow(page)
+        })
+    }
+}
+
+
 test('groups generator tools together in the sidebar', async ({ page }) => {
     await page.goto('/tools/hash-generator')
 
@@ -964,4 +983,154 @@ test('url parser splits and rebuilds URLs', async ({ page }) => {
     await expect(page.getByText('lang = vi')).toBeVisible()
     await expect(page.getByText('#intro', { exact: true })).toBeVisible()
     await expect(page.locator('.split-right').getByText('https://example.com:8080/docs?q=tools&lang=vi#intro')).toBeVisible()
+})
+
+
+test('unit converter converts common units offline', async ({ page }) => {
+    await page.goto('/tools/unit-converter')
+    await expect(page.getByRole('heading', { name: 'Unit Converter' })).toBeVisible()
+    await page.getByLabel('Value').fill('1000')
+    await page.getByLabel('Category').selectOption('Length')
+    await page.getByLabel('From unit').selectOption('Meter')
+    await page.getByLabel('To unit').selectOption('Kilometer')
+    await page.getByRole('button', { name: 'Convert' }).click()
+    await expect(page.getByText('1 Kilometer')).toBeVisible()
+})
+
+test('number base converter converts decimal to other bases', async ({ page }) => {
+    await page.goto('/tools/number-base-converter')
+    await expect(page.getByRole('heading', { name: 'Number Base Converter' })).toBeVisible()
+    await page.getByLabel('Number').fill('255')
+    await page.getByLabel('Input base').selectOption('Decimal')
+    await page.getByRole('button', { name: 'Convert Number' }).click()
+    await expect(page.getByRole('heading', { name: 'Binary' })).toBeVisible()
+    await expect(page.getByText('11111111')).toBeVisible()
+    await expect(page.locator('.split-right').getByText('FF', { exact: true })).toBeVisible()
+})
+
+test('escape unescape converts JSON strings', async ({ page }) => {
+    await page.goto('/tools/escape-unescape')
+    await expect(page.getByRole('heading', { name: 'Escape / Unescape' })).toBeVisible()
+    await page.getByLabel('Mode').selectOption('JSON string')
+    await page.getByLabel('Direction').selectOption('Escape')
+    await page.locator('textarea').fill('Hello "Useful" Tools')
+    await page.getByRole('button', { name: 'Run Escape' }).click()
+    await expect(page.locator('.fo-code')).toHaveText('Hello \\"Useful\\" Tools')
+})
+
+
+test('YAML Preview renders OpenAPI docs offline', async ({ page }) => {
+    await page.goto('/tools/yaml-preview')
+
+    await expect(page.getByRole('heading', { name: 'YAML Preview' })).toBeVisible()
+
+    await page.locator('textarea').fill(`openapi: 3.0.3
+info:
+  title: Useful Tools API
+  version: 1.0.0
+servers:
+  - url: https://api.example.test
+paths:
+  /tools:
+    get:
+      summary: List tools
+      responses:
+        '200':
+          description: Tool list`)
+
+    await expect(page.locator('.swagger-ui')).toContainText('Useful Tools API')
+    await expect(page.locator('.swagger-ui')).toContainText('https://api.example.test')
+    await expect(page.locator('.swagger-ui')).toContainText('GET')
+    await expect(page.locator('.swagger-ui')).toContainText('/tools')
+    await expect(page.locator('.swagger-ui')).toContainText('200')
+    await expect(page.getByRole('button', { name: /Try it out/i })).toBeVisible()
+    await expect(page.locator('.yaml-preview-page .split-workspace')).toHaveCount(0)
+})
+
+test('YAML Preview renders generic YAML tree offline', async ({ page }) => {
+    await page.goto('/tools/yaml-preview')
+
+    await expect(page.getByRole('heading', { name: 'YAML Preview' })).toBeVisible()
+
+    await page.locator('textarea').fill(`project:
+  name: Useful Tools
+  features:
+    - yaml preview
+    - offline docs`)
+
+    await expect(page.locator('.yaml-tree-preview')).toContainText('project')
+    await expect(page.locator('.yaml-tree-preview')).toContainText('features')
+    await expect(page.locator('.yaml-tree-preview')).toContainText('yaml preview')
+})
+
+test('YAML Preview formats YAML from toolbar action', async ({ page }) => {
+    await page.goto('/tools/yaml-preview')
+
+    await page.locator('textarea').fill('name: Useful Tools\nitems:\n- json\n- yaml')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('textarea')).toHaveValue(/items:\n  - json\n  - yaml/)
+    await expect(page.locator('.yaml-tree-preview')).toContainText('Useful Tools')
+})
+
+test('YAML Preview manual preview works when auto preview is disabled', async ({ page }) => {
+    await page.goto('/tools/yaml-preview')
+
+    await page.getByLabel('Auto preview').uncheck()
+    await page.locator('textarea').fill('name: Manual Preview')
+    await expect(page.locator('.yaml-preview-output')).not.toContainText('Manual Preview')
+
+    await page.getByRole('button', { name: 'Preview' }).click()
+    await expect(page.locator('.yaml-tree-preview')).toContainText('Manual Preview')
+})
+
+test('YAML Preview avoids horizontal overflow at core breakpoints', async ({ page }) => {
+    for (const breakpoint of breakpoints) {
+        await page.setViewportSize({ width: breakpoint.width, height: breakpoint.height })
+        await page.goto('/tools/yaml-preview')
+        await expect(page.getByRole('heading', { name: 'YAML Preview' })).toBeVisible()
+        await expectNoHorizontalOverflow(page)
+    }
+})
+
+test('formats, minifies, and validates XML offline', async ({ page }) => {
+    await page.goto('/tools/xml-formatter')
+
+    await expect(page.getByRole('heading', { name: 'XML Formatter' })).toBeVisible()
+
+    await page.locator('textarea').fill('<root><item id="1">Alpha</item><item id="2">Beta</item></root>')
+    await page.getByRole('button', { name: 'Format' }).click()
+
+    await expect(page.locator('.fo-output')).toContainText('<root>')
+    await expect(page.locator('.fo-output')).toContainText('<item id="1">')
+
+    await page.getByRole('button', { name: 'Minify' }).click()
+    await expect(page.locator('.fo-output')).toContainText('<root><item id="1">Alpha</item><item id="2">Beta</item></root>')
+
+    await page.locator('textarea').fill('<root><item></root>')
+    await page.getByRole('button', { name: 'Format' }).click()
+    await expect(page.locator('.formatter-error')).toContainText('Invalid XML')
+})
+
+test('compares JSON objects and reports added removed changed fields', async ({ page }) => {
+    await page.goto('/tools/json-compare')
+
+    await expect(page.getByRole('heading', { name: 'JSON Compare' })).toBeVisible()
+
+    const editors = page.locator('textarea')
+    await editors.nth(0).fill('{"name":"tool","version":1,"old":true}')
+    await editors.nth(1).fill('{"name":"toolkit","version":1,"new":true}')
+
+    await page.getByRole('button', { name: 'Compare' }).click()
+
+    await expect(page.getByRole('heading', { name: 'Changed' })).toBeVisible()
+    await expect(page.locator('.json-compare-results')).toContainText('name')
+    await expect(page.getByRole('heading', { name: 'Removed' })).toBeVisible()
+    await expect(page.locator('.json-compare-results')).toContainText('old')
+    await expect(page.getByRole('heading', { name: 'Added' })).toBeVisible()
+    await expect(page.locator('.json-compare-results')).toContainText('new')
+
+    await editors.nth(0).fill('{"name":}')
+    await page.getByRole('button', { name: 'Compare' }).click()
+    await expect(page.locator('.formatter-error')).toContainText('Invalid original JSON')
 })

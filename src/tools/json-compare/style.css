@@ -1,0 +1,82 @@
+.json-compare-page {
+    min-width: 0;
+}
+
+.json-compare-editors {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+    height: 100%;
+    min-width: 0;
+}
+
+.json-compare-editor-panel {
+    display: flex;
+    min-width: 0;
+    min-height: 0;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.json-compare-label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.json-compare-results {
+    height: 100%;
+    overflow: auto;
+    padding: 16px;
+}
+
+.json-compare-summary {
+    margin: 0 0 12px;
+    color: var(--text-muted);
+}
+
+.json-compare-group {
+    margin-bottom: 18px;
+}
+
+.json-compare-group h2 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.json-compare-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.json-compare-item {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--surface-subtle);
+    overflow-wrap: anywhere;
+}
+
+.json-compare-path {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 700;
+}
+
+.json-compare-value {
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 700px) {
+    .json-compare-editors {
+        grid-template-columns: 1fr;
+    }
+}

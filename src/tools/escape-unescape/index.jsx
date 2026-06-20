@@ -1,0 +1,11 @@
+import { useMemo, useState } from 'react'
+import { Button, Input } from 'antd'
+import { Braces } from 'lucide-react'
+import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
+import { escapeUnescapeExample } from './example.js'
+import './style.css'
+function esc(text,mode){if(mode==='JSON string') return JSON.stringify(text).slice(1,-1); if(mode==='URL component') return encodeURIComponent(text); if(mode==='Regex') return text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); return text.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\n/g,'\\n')}
+function unesc(text,mode){try{if(mode==='JSON string') return JSON.parse(`"${text}"`); if(mode==='URL component') return decodeURIComponent(text); if(mode==='Regex') return text.replace(/\\([.*+?^${}()|[\]\\])/g,'$1'); return JSON.parse(`"${text.replace(/"/g,'\\"')}"`)}catch(e){return `Error: ${e.message}`}}
+export default function EscapeUnescapeTool(){const [value,setValue]=useState(escapeUnescapeExample); const [mode,setMode]=useState('JSON string'); const [direction,setDirection]=useState('Escape'); const [result,setResult]=useState(''); const run=()=>setResult(direction==='Escape'?esc(value,mode):unesc(value,mode)); useToolActions(useMemo(()=><Button icon={<Braces size={16}/>} type="primary" onClick={run}>Run Escape</Button>,[value,mode,direction])); return <div className="tool-page developer-tool-page"><SplitWorkspace leftToolbar={<><label className="tool-function-label" htmlFor="escape-mode">Mode</label><select id="escape-mode" aria-label="Mode" value={mode} onChange={(e)=>setMode(e.target.value)}>{['JSON string','JavaScript string','Regex','URL component'].map(x=><option key={x}>{x}</option>)}</select><label className="tool-function-label" htmlFor="escape-direction">Direction</label><select id="escape-direction" aria-label="Direction" value={direction} onChange={(e)=>setDirection(e.target.value)}><option>Escape</option><option>Unescape</option></select></>} left={<Input.TextArea className="tool-editor" value={value} onChange={(e)=>setValue(e.target.value)} spellCheck={false}/>} right={<FormatterOutput code={result} language="text"/>} /></div>}

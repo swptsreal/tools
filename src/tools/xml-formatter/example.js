@@ -1,0 +1,1 @@
+export const xmlExample = `<catalog><book id="bk101"><title>Useful Tools</title><author>Local Browser</author></book><book id="bk102"><title>Offline First</title><author>Toolkit</author></book></catalog>`

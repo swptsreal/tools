@@ -22,12 +22,38 @@ import {
     ListMinus,
     Palette,
     Regex,
+    Ruler,
     ShieldCheck,
     Workflow
 } from 'lucide-react'
 
 export const tools = [
 
+
+    {
+        id: 'unit-converter',
+        name: 'Unit Converter',
+        group: 'Developer',
+        description: 'Convert length, weight, temperature, and storage units offline.',
+        icon: Ruler,
+        Component: lazy(() => import('./unit-converter/index.jsx'))
+    },
+    {
+        id: 'number-base-converter',
+        name: 'Number Base Converter',
+        group: 'Developer',
+        description: 'Convert numbers between binary, octal, decimal, and hex offline.',
+        icon: Binary,
+        Component: lazy(() => import('./number-base-converter/index.jsx'))
+    },
+    {
+        id: 'escape-unescape',
+        name: 'Escape / Unescape',
+        group: 'Developer',
+        description: 'Escape and unescape JSON, JavaScript, regex, and URL text offline.',
+        icon: Braces,
+        Component: lazy(() => import('./escape-unescape/index.jsx'))
+    },
     {
         id: 'regex-tester',
         name: 'Regex Tester',
@@ -91,6 +117,30 @@ export const tools = [
         description: 'Format CSS stylesheets offline.',
         icon: Palette,
         Component: lazy(() => import('./css-formatter/index.jsx'))
+    },
+    {
+        id: 'yaml-preview',
+        name: 'YAML Preview',
+        group: 'Preview',
+        description: 'Preview OpenAPI docs or generic YAML trees offline.',
+        icon: FileCode2,
+        Component: lazy(() => import('./yaml-preview/index.jsx'))
+    },
+    {
+        id: 'xml-formatter',
+        name: 'XML Formatter',
+        group: 'Formatter',
+        description: 'Format, minify, and validate XML offline.',
+        icon: CodeXml,
+        Component: lazy(() => import('./xml-formatter/index.jsx'))
+    },
+    {
+        id: 'json-compare',
+        name: 'JSON Compare',
+        group: 'Formatter',
+        description: 'Compare two JSON objects and highlight field changes offline.',
+        icon: GitCompareArrows,
+        Component: lazy(() => import('./json-compare/index.jsx'))
     },
     {
         id: 'mermaid-preview',

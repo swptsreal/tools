@@ -110,7 +110,9 @@ function TreeNode({ name, value }) {
 
 function YamlPreviewContent({ state }) {
     if (state.error) {
-        return <pre className="formatter-error">Invalid YAML: {state.error}</pre>
+        return (
+            <pre className="formatter-error">Invalid YAML: {state.error}</pre>
+        )
     }
 
     if (isOpenApi(state.data)) {
@@ -133,7 +135,9 @@ function YamlPreviewContent({ state }) {
 }
 
 export default function YamlPreviewTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, yamlPreviewExample))
+    const [value, setValue] = useState(() =>
+        loadDraft(toolId, yamlPreviewExample)
+    )
     const [previewValue, setPreviewValue] = useState(value)
     const [indentSize, setIndentSize] = useState(2)
     const [autoPreview, setAutoPreview] = useState(true)
@@ -237,7 +241,11 @@ export default function YamlPreviewTool() {
                 <Button
                     icon={<Download size={16} />}
                     onClick={() =>
-                        downloadTextFile(value, 'preview.yaml', 'application/yaml')
+                        downloadTextFile(
+                            value,
+                            'preview.yaml',
+                            'application/yaml'
+                        )
                     }
                 >
                     Download
@@ -249,7 +257,9 @@ export default function YamlPreviewTool() {
                     <input
                         type="checkbox"
                         checked={autoPreview}
-                        onChange={(event) => setAutoPreview(event.target.checked)}
+                        onChange={(event) =>
+                            setAutoPreview(event.target.checked)
+                        }
                     />
                     <span>Auto preview</span>
                 </label>
@@ -262,25 +272,27 @@ export default function YamlPreviewTool() {
 
     return (
         <div className="tool-page yaml-preview-page">
-            <div
-                className="tool-function-bar yaml-preview-options"
-                role="toolbar"
-                aria-label="Input options"
-            >
-                <span className="tool-function-label">Indent</span>
-                <Radio.Group
-                    optionType="button"
-                    size="small"
-                    value={indentSize}
-                    onChange={(event) => setIndentSize(event.target.value)}
-                    options={[
-                        { label: '2 spaces', value: 2 },
-                        { label: '4 spaces', value: 4 }
-                    ]}
-                />
-            </div>
             <div className="yaml-preview-layout">
                 <section className="yaml-editor-panel" aria-label="YAML editor">
+                    <div
+                        className="tool-function-bar"
+                        role="toolbar"
+                        aria-label="Input options"
+                    >
+                        <span className="tool-function-label">Indent</span>
+                        <Radio.Group
+                            optionType="button"
+                            size="small"
+                            value={indentSize}
+                            onChange={(event) =>
+                                setIndentSize(event.target.value)
+                            }
+                            options={[
+                                { label: '2 spaces', value: 2 },
+                                { label: '4 spaces', value: 4 }
+                            ]}
+                        />
+                    </div>
                     <Input.TextArea
                         className="tool-editor"
                         value={value}
@@ -288,7 +300,10 @@ export default function YamlPreviewTool() {
                         spellCheck={false}
                     />
                 </section>
-                <section className="yaml-preview-output" aria-label="YAML preview">
+                <section
+                    className="yaml-preview-output"
+                    aria-label="YAML preview"
+                >
                     <YamlPreviewContent state={previewState} />
                 </section>
             </div>

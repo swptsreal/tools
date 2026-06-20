@@ -361,6 +361,61 @@ test('uses a mobile header and drawer sidebar on small screens', async ({ page }
     await expect(page.locator('.app-header').getByRole('heading', { name: 'Markdown Preview' })).toBeVisible()
 })
 
+
+
+test('shows line numbers beside JSON compare editors', async ({ page }) => {
+    await page.goto('/tools/json-compare')
+
+    const firstEditor = page.locator('.json-compare-editor-panel').first()
+    await firstEditor.locator('textarea').fill(`{
+  "name": "Useful Tools"
+}`)
+
+    await expect(firstEditor.locator('.json-compare-line-number')).toHaveText([
+        '1',
+        '2',
+        '3'
+    ])
+
+    const metrics = await firstEditor.evaluate((element) => {
+        const gutter = element
+            .querySelector('.json-compare-line-gutter')
+            ?.getBoundingClientRect()
+        const textarea = element
+            .querySelector('textarea')
+            ?.getBoundingClientRect()
+
+        return {
+            gutterRight: gutter?.right ?? 0,
+            textareaLeft: textarea?.left ?? 0
+        }
+    })
+
+    expect(metrics.gutterRight).toBeLessThanOrEqual(metrics.textareaLeft)
+})
+
+test('lays out JSON compare without splitter and gives results 45 percent', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/tools/json-compare')
+
+    await expect(page.locator('.json-compare-workspace')).toBeVisible()
+    await expect(page.locator('.json-compare-results-panel')).toBeVisible()
+    await expect(page.locator('.json-compare-page .ant-splitter')).toHaveCount(0)
+    await expect(page.locator('.json-compare-page .split-workspace')).toHaveCount(0)
+
+    const metrics = await page.evaluate(() => {
+        const workspace = document.querySelector('.json-compare-workspace')?.getBoundingClientRect()
+        const results = document.querySelector('.json-compare-results-panel')?.getBoundingClientRect()
+
+        return {
+            workspaceWidth: workspace?.width ?? 0,
+            resultsWidth: results?.width ?? 0
+        }
+    })
+
+    expect(metrics.resultsWidth / metrics.workspaceWidth).toBeCloseTo(0.45, 1)
+})
+
 for (const viewport of breakpoints) {
     test(`keeps the workspace usable without horizontal overflow on ${viewport.name}`, async ({ page }) => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height })

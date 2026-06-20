@@ -1,7 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input, message } from 'antd'
-import { Clipboard, Download, GitCompareArrows, RotateCcw, Shuffle } from 'lucide-react'
-import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import {
+    Clipboard,
+    Download,
+    GitCompareArrows,
+    RotateCcw,
+    Shuffle
+} from 'lucide-react'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
@@ -30,18 +35,24 @@ function diffValues(left, right, path = '') {
         const max = Math.max(left.length, right.length)
         return Array.from({ length: max }).flatMap((_, index) => {
             const itemPath = pathJoin(path, index)
-            if (index >= left.length) return [{ type: 'added', path: itemPath, right: right[index] }]
-            if (index >= right.length) return [{ type: 'removed', path: itemPath, left: left[index] }]
+            if (index >= left.length)
+                return [{ type: 'added', path: itemPath, right: right[index] }]
+            if (index >= right.length)
+                return [{ type: 'removed', path: itemPath, left: left[index] }]
             return diffValues(left[index], right[index], itemPath)
         })
     }
 
     if (isObject(left) && isObject(right)) {
-        const keys = Array.from(new Set([...Object.keys(left), ...Object.keys(right)])).sort()
+        const keys = Array.from(
+            new Set([...Object.keys(left), ...Object.keys(right)])
+        ).sort()
         return keys.flatMap((key) => {
             const itemPath = pathJoin(path, key)
-            if (!(key in left)) return [{ type: 'added', path: itemPath, right: right[key] }]
-            if (!(key in right)) return [{ type: 'removed', path: itemPath, left: left[key] }]
+            if (!(key in left))
+                return [{ type: 'added', path: itemPath, right: right[key] }]
+            if (!(key in right))
+                return [{ type: 'removed', path: itemPath, left: left[key] }]
             return diffValues(left[key], right[key], itemPath)
         })
     }
@@ -62,7 +73,70 @@ function groupDiffs(diffs) {
 }
 
 function serializeDiffs(groups) {
-    return ['Added', ...groups.added.map((item) => `+ ${item.path}: ${valuePreview(item.right)}`), '', 'Removed', ...groups.removed.map((item) => `- ${item.path}: ${valuePreview(item.left)}`), '', 'Changed', ...groups.changed.map((item) => `~ ${item.path}: ${valuePreview(item.left)} -> ${valuePreview(item.right)}`)].join('\n')
+    return [
+        'Added',
+        ...groups.added.map(
+            (item) => `+ ${item.path}: ${valuePreview(item.right)}`
+        ),
+        '',
+        'Removed',
+        ...groups.removed.map(
+            (item) => `- ${item.path}: ${valuePreview(item.left)}`
+        ),
+        '',
+        'Changed',
+        ...groups.changed.map(
+            (item) =>
+                `~ ${item.path}: ${valuePreview(item.left)} -> ${valuePreview(item.right)}`
+        )
+    ].join('\n')
+}
+
+function lineNumbersFor(value) {
+    return Array.from(
+        { length: value.split('\n').length },
+        (_, index) => index + 1
+    )
+}
+
+function NumberedJsonEditor({ label, value, onChange }) {
+    const gutterRef = useRef(null)
+    const numbers = lineNumbersFor(value)
+
+    const syncGutterScroll = (event) => {
+        if (gutterRef.current) {
+            gutterRef.current.scrollTop = event.currentTarget.scrollTop
+        }
+    }
+
+    return (
+        <label className="json-compare-editor-panel">
+            <span className="json-compare-label">{label}</span>
+            <div className="json-compare-numbered-editor">
+                <div
+                    className="json-compare-line-gutter"
+                    aria-hidden="true"
+                    ref={gutterRef}
+                >
+                    {numbers.map((number) => (
+                        <span
+                            className="json-compare-line-number"
+                            key={number}
+                        >
+                            {number}
+                        </span>
+                    ))}
+                </div>
+                <Input.TextArea
+                    className="tool-editor json-compare-editor"
+                    value={value}
+                    onChange={onChange}
+                    onScroll={syncGutterScroll}
+                    spellCheck={false}
+                />
+            </div>
+        </label>
+    )
 }
 
 function DiffGroup({ title, items }) {
@@ -72,11 +146,27 @@ function DiffGroup({ title, items }) {
             {items.length ? (
                 <ul className="json-compare-list">
                     {items.map((item) => (
-                        <li className="json-compare-item" key={`${item.type}-${item.path}`}>
+                        <li
+                            className="json-compare-item"
+                            key={`${item.type}-${item.path}`}
+                        >
                             <div className="json-compare-path">{item.path}</div>
-                            {item.type === 'added' ? <div className="json-compare-value">Added: {valuePreview(item.right)}</div> : null}
-                            {item.type === 'removed' ? <div className="json-compare-value">Removed: {valuePreview(item.left)}</div> : null}
-                            {item.type === 'changed' ? <div className="json-compare-value">Before: {valuePreview(item.left)}\nAfter: {valuePreview(item.right)}</div> : null}
+                            {item.type === 'added' ? (
+                                <div className="json-compare-value">
+                                    Added: {valuePreview(item.right)}
+                                </div>
+                            ) : null}
+                            {item.type === 'removed' ? (
+                                <div className="json-compare-value">
+                                    Removed: {valuePreview(item.left)}
+                                </div>
+                            ) : null}
+                            {item.type === 'changed' ? (
+                                <div className="json-compare-value">
+                                    Before: {valuePreview(item.left)}\nAfter:{' '}
+                                    {valuePreview(item.right)}
+                                </div>
+                            ) : null}
                         </li>
                     ))}
                 </ul>
@@ -88,8 +178,12 @@ function DiffGroup({ title, items }) {
 }
 
 export default function JsonCompareTool() {
-    const [leftValue, setLeftValue] = useState(() => loadDraft(leftDraftId, leftJsonExample))
-    const [rightValue, setRightValue] = useState(() => loadDraft(rightDraftId, rightJsonExample))
+    const [leftValue, setLeftValue] = useState(() =>
+        loadDraft(leftDraftId, leftJsonExample)
+    )
+    const [rightValue, setRightValue] = useState(() =>
+        loadDraft(rightDraftId, rightJsonExample)
+    )
     const [groups, setGroups] = useState(() => groupDiffs([]))
     const [error, setError] = useState('')
 
@@ -147,11 +241,34 @@ export default function JsonCompareTool() {
     const actions = useMemo(
         () => (
             <>
-                <Button icon={<GitCompareArrows size={16} />} type="primary" onClick={compare}>Compare</Button>
-                <Button icon={<Shuffle size={16} />} onClick={swap}>Swap</Button>
-                <Button icon={<Clipboard size={16} />} onClick={copy}>Copy Result</Button>
-                <Button icon={<Download size={16} />} onClick={() => downloadTextFile(resultText, 'json-compare.txt', 'text/plain')}>Download</Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+                <Button
+                    icon={<GitCompareArrows size={16} />}
+                    type="primary"
+                    onClick={compare}
+                >
+                    Compare
+                </Button>
+                <Button icon={<Shuffle size={16} />} onClick={swap}>
+                    Swap
+                </Button>
+                <Button icon={<Clipboard size={16} />} onClick={copy}>
+                    Copy Result
+                </Button>
+                <Button
+                    icon={<Download size={16} />}
+                    onClick={() =>
+                        downloadTextFile(
+                            resultText,
+                            'json-compare.txt',
+                            'text/plain'
+                        )
+                    }
+                >
+                    Download
+                </Button>
+                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>
+                    Example
+                </Button>
             </>
         ),
         [leftValue, resultText, rightValue]
@@ -159,34 +276,44 @@ export default function JsonCompareTool() {
 
     useToolActions(actions)
 
-    const total = groups.added.length + groups.removed.length + groups.changed.length
+    const total =
+        groups.added.length + groups.removed.length + groups.changed.length
 
     return (
         <div className="tool-page json-compare-page">
-            <SplitWorkspace
-                left={
-                    <div className="json-compare-editors">
-                        <label className="json-compare-editor-panel">
-                            <span className="json-compare-label">Original JSON</span>
-                            <Input.TextArea className="tool-editor" value={leftValue} onChange={(event) => setLeftValue(event.target.value)} spellCheck={false} />
-                        </label>
-                        <label className="json-compare-editor-panel">
-                            <span className="json-compare-label">Changed JSON</span>
-                            <Input.TextArea className="tool-editor" value={rightValue} onChange={(event) => setRightValue(event.target.value)} spellCheck={false} />
-                        </label>
-                    </div>
-                }
-                right={error ? (
-                    <pre className="formatter-error">{error}</pre>
-                ) : (
-                    <div className="json-compare-results">
-                        <p className="json-compare-summary">{total === 0 ? 'No differences yet. Click Compare to inspect JSON.' : `${total} difference(s) found.`}</p>
-                        <DiffGroup title="Added" items={groups.added} />
-                        <DiffGroup title="Removed" items={groups.removed} />
-                        <DiffGroup title="Changed" items={groups.changed} />
-                    </div>
-                )}
-            />
+            <div className="json-compare-workspace">
+                <div className="json-compare-editors split-left">
+                    <NumberedJsonEditor
+                        label="Original JSON"
+                        value={leftValue}
+                        onChange={(event) => setLeftValue(event.target.value)}
+                    />
+                    <NumberedJsonEditor
+                        label="Changed JSON"
+                        value={rightValue}
+                        onChange={(event) => setRightValue(event.target.value)}
+                    />
+                </div>
+                <section
+                    className="json-compare-results-panel"
+                    aria-label="Comparison results"
+                >
+                    {error ? (
+                        <pre className="formatter-error">{error}</pre>
+                    ) : (
+                        <div className="json-compare-results">
+                            <p className="json-compare-summary">
+                                {total === 0
+                                    ? 'No differences yet. Click Compare to inspect JSON.'
+                                    : `${total} difference(s) found.`}
+                            </p>
+                            <DiffGroup title="Added" items={groups.added} />
+                            <DiffGroup title="Removed" items={groups.removed} />
+                            <DiffGroup title="Changed" items={groups.changed} />
+                        </div>
+                    )}
+                </section>
+            </div>
         </div>
     )
 }

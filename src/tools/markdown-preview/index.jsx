@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { useDebouncedValue } from '../../shared/hooks/useDebouncedValue.js'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -60,7 +61,7 @@ export default function MarkdownPreviewTool() {
                     </>
                 )}
                 left={
-                    <Input.TextArea
+                    <FormatterInput language="markdown"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}

@@ -4,6 +4,7 @@ import { Clipboard, Download, FileSpreadsheet, FileUp, RotateCcw } from 'lucide-
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
@@ -138,7 +139,7 @@ export default function CsvJsonConverterTool() {
                         <Input aria-label="Delimiter" size="small" value={delimiter} onChange={(event) => setDelimiter(event.target.value.slice(-1) || ',')} style={{ width: 54 }} />
                     </>
                 )}
-                left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
+                left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language={language} />}
             />
         </div>

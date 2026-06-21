@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Radio, Upload } from 'antd'
+import { Button, message, Radio, Upload } from 'antd'
 import {
     Clipboard,
     Download,
@@ -13,6 +13,7 @@ import SwaggerUI from 'swagger-ui-react'
 import 'swagger-ui-react/swagger-ui.css'
 import { parseDocument } from 'yaml'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useDebouncedValue } from '../../shared/hooks/useDebouncedValue.js'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
@@ -293,7 +294,7 @@ export default function YamlPreviewTool() {
                             ]}
                         />
                     </div>
-                    <Input.TextArea
+                    <FormatterInput language="yaml"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}

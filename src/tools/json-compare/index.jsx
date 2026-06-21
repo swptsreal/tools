@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Input, message } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
+import { Button, message } from 'antd'
 import {
     Clipboard,
     Download,
@@ -8,6 +8,7 @@ import {
     Shuffle
 } from 'lucide-react'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
@@ -92,49 +93,17 @@ function serializeDiffs(groups) {
     ].join('\n')
 }
 
-function lineNumbersFor(value) {
-    return Array.from(
-        { length: value.split('\n').length },
-        (_, index) => index + 1
-    )
-}
-
-function NumberedJsonEditor({ label, value, onChange }) {
-    const gutterRef = useRef(null)
-    const numbers = lineNumbersFor(value)
-
-    const syncGutterScroll = (event) => {
-        if (gutterRef.current) {
-            gutterRef.current.scrollTop = event.currentTarget.scrollTop
-        }
-    }
-
+function JsonCompareEditor({ label, value, onChange }) {
     return (
         <label className="json-compare-editor-panel">
             <span className="json-compare-label">{label}</span>
-            <div className="json-compare-numbered-editor">
-                <div
-                    className="json-compare-line-gutter"
-                    aria-hidden="true"
-                    ref={gutterRef}
-                >
-                    {numbers.map((number) => (
-                        <span
-                            className="json-compare-line-number"
-                            key={number}
-                        >
-                            {number}
-                        </span>
-                    ))}
-                </div>
-                <Input.TextArea
-                    className="tool-editor json-compare-editor"
-                    value={value}
-                    onChange={onChange}
-                    onScroll={syncGutterScroll}
-                    spellCheck={false}
-                />
-            </div>
+            <FormatterInput
+                language="json"
+                className="tool-editor json-compare-editor"
+                value={value}
+                onChange={onChange}
+                spellCheck={false}
+            />
         </label>
     )
 }
@@ -283,12 +252,12 @@ export default function JsonCompareTool() {
         <div className="tool-page json-compare-page">
             <div className="json-compare-workspace">
                 <div className="json-compare-editors split-left">
-                    <NumberedJsonEditor
+                    <JsonCompareEditor
                         label="Original JSON"
                         value={leftValue}
                         onChange={(event) => setLeftValue(event.target.value)}
                     />
-                    <NumberedJsonEditor
+                    <JsonCompareEditor
                         label="Changed JSON"
                         value={rightValue}
                         onChange={(event) => setRightValue(event.target.value)}

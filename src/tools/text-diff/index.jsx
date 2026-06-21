@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message } from 'antd'
 import { Clipboard, Download, GitCompareArrows, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
@@ -50,5 +51,5 @@ export default function TextDiffTool() {
     const reset = () => { setOriginal(textDiffOriginalExample); setChanged(textDiffChangedExample); setRows([]) }
     const actions = useMemo(() => <><Button icon={<GitCompareArrows size={16} />} type="primary" onClick={compare}>Compare</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(output, 'text-diff.txt')}>Download</Button><Button icon={<RotateCcw size={16} />} onClick={reset}>Example</Button></>, [original, changed, output])
     useToolActions(actions)
-    return <div className="tool-page text-tool-page"><SplitWorkspace left={<div className="text-diff-inputs"><div className="text-diff-field"><label htmlFor="text-diff-original">Original</label><Input.TextArea id="text-diff-original" className="tool-editor" value={original} onChange={(event) => setOriginal(event.target.value)} spellCheck={false} /></div><div className="text-diff-field"><label htmlFor="text-diff-changed">Changed</label><Input.TextArea id="text-diff-changed" className="tool-editor" value={changed} onChange={(event) => setChanged(event.target.value)} spellCheck={false} /></div></div>} right={<pre className="text-diff-result">{rows.map((row, index) => <div key={`${row.type}-${index}`} className={`text-diff-row diff-row-${row.type}`}>{row.type === 'added' ? '+ ' : row.type === 'removed' ? '- ' : '  '}{row.text}</div>)}</pre>} /></div>
+    return <div className="tool-page text-tool-page"><SplitWorkspace left={<div className="text-diff-inputs"><div className="text-diff-field"><label htmlFor="text-diff-original">Original</label><FormatterInput language="text" id="text-diff-original" className="tool-editor" value={original} onChange={(event) => setOriginal(event.target.value)} spellCheck={false} /></div><div className="text-diff-field"><label htmlFor="text-diff-changed">Changed</label><FormatterInput language="text" id="text-diff-changed" className="tool-editor" value={changed} onChange={(event) => setChanged(event.target.value)} spellCheck={false} /></div></div>} right={<pre className="text-diff-result">{rows.map((row, index) => <div key={`${row.type}-${index}`} className={`text-diff-row diff-row-${row.type}`}>{row.type === 'added' ? '+ ' : row.type === 'removed' ? '- ' : '  '}{row.text}</div>)}</pre>} /></div>
 }

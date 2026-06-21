@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw, ArrowDownAZ } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -50,5 +51,5 @@ export default function SortLinesTool() {
 
     useToolActions(actions)
 
-    return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><span className="tool-function-label">Order</span><Radio.Group optionType="button" size="small" value={direction} onChange={(event) => setDirection(event.target.value)} options={[{ label: 'Ascending', value: 'Ascending' }, { label: 'Descending', value: 'Descending' }]} /><Checkbox checked={trimLines} onChange={(event) => setTrimLines(event.target.checked)}>Trim lines</Checkbox><Checkbox checked={removeEmpty} onChange={(event) => setRemoveEmpty(event.target.checked)}>Remove empty lines</Checkbox><Checkbox checked={caseInsensitive} onChange={(event) => setCaseInsensitive(event.target.checked)}>Case insensitive</Checkbox></>} left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<FormatterOutput code={result} language="text" />} /></div>
+    return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><span className="tool-function-label">Order</span><Radio.Group optionType="button" size="small" value={direction} onChange={(event) => setDirection(event.target.value)} options={[{ label: 'Ascending', value: 'Ascending' }, { label: 'Descending', value: 'Descending' }]} /><Checkbox checked={trimLines} onChange={(event) => setTrimLines(event.target.checked)}>Trim lines</Checkbox><Checkbox checked={removeEmpty} onChange={(event) => setRemoveEmpty(event.target.checked)}>Remove empty lines</Checkbox><Checkbox checked={caseInsensitive} onChange={(event) => setCaseInsensitive(event.target.checked)}>Case insensitive</Checkbox></>} left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<FormatterOutput code={result} language="text" />} /></div>
 }

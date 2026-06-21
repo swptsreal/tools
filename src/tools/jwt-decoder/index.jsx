@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileUp, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -103,7 +104,7 @@ export default function JwtDecoderTool() {
                         <Radio.Group optionType="button" size="small" value={section} onChange={(event) => setSection(event.target.value)} options={[{ label: 'All', value: 'All' }, { label: 'Header only', value: 'Header only' }, { label: 'Payload only', value: 'Payload only' }]} />
                     </>
                 )}
-                left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
+                left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={output}
             />
         </div>

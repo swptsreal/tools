@@ -4,6 +4,7 @@ import { Clipboard, Download, Palette, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
@@ -105,7 +106,7 @@ export default function ColorConverterTool() {
                         <Radio.Group optionType="button" size="small" value={outputFormat} onChange={(event) => setOutputFormat(event.target.value)} options={[{ label: 'All', value: 'All' }, { label: 'HEX', value: 'HEX' }, { label: 'RGB', value: 'RGB' }, { label: 'HSL', value: 'HSL' }]} />
                     </>
                 )}
-                left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
+                left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language="css" />}
             />
         </div>

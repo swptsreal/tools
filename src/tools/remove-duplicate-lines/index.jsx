@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, ListMinus, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -45,5 +46,5 @@ export default function RemoveDuplicateLinesTool() {
     const actions = useMemo(() => <><Upload beforeUpload={openFile} showUploadList={false} accept=".txt,.csv,.log"><Button icon={<FileUp size={16} />}>Open</Button></Upload><Button icon={<ListMinus size={16} />} type="primary" onClick={run}>Remove Duplicates</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'unique-lines.txt')}>Download</Button><Button icon={<RotateCcw size={16} />} onClick={() => { setValue(removeDuplicateLinesExample); setResult(''); setSummary('') }}>Example</Button></>, [value, result, trimLines, ignoreCase, removeEmpty])
     useToolActions(actions)
 
-    return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><Checkbox checked={trimLines} onChange={(event) => setTrimLines(event.target.checked)}>Trim lines</Checkbox><Checkbox checked={ignoreCase} onChange={(event) => setIgnoreCase(event.target.checked)}>Ignore case</Checkbox><Checkbox checked={removeEmpty} onChange={(event) => setRemoveEmpty(event.target.checked)}>Remove empty lines</Checkbox></>} left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<><div className="text-tool-summary">{summary || 'Run Remove Duplicates to see summary.'}</div><FormatterOutput code={result} language="text" /></>} /></div>
+    return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><Checkbox checked={trimLines} onChange={(event) => setTrimLines(event.target.checked)}>Trim lines</Checkbox><Checkbox checked={ignoreCase} onChange={(event) => setIgnoreCase(event.target.checked)}>Ignore case</Checkbox><Checkbox checked={removeEmpty} onChange={(event) => setRemoveEmpty(event.target.checked)}>Remove empty lines</Checkbox></>} left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<><div className="text-tool-summary">{summary || 'Run Remove Duplicates to see summary.'}</div><FormatterOutput code={result} language="text" /></>} /></div>
 }

@@ -1,0 +1,219 @@
+.formatter-input {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    background: var(--fi-bg);
+    color: var(--fi-text);
+    font-family: Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.formatter-input:focus-within {
+    box-shadow: inset 0 0 0 1px var(--fi-focus);
+}
+
+.formatter-input-scroll,
+.formatter-input-textarea {
+    position: absolute;
+    inset: 0;
+    padding: 16px 16px 16px 56px;
+    border: 0;
+    font: inherit;
+    line-height: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    tab-size: 4;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.formatter-input-scroll {
+    pointer-events: none;
+    color: var(--fi-text);
+}
+
+.formatter-input-highlight {
+    min-width: 0;
+    max-width: 100%;
+    padding-bottom: 16px;
+}
+
+.fi-line {
+    position: relative;
+    min-height: 21px;
+    min-width: 0;
+}
+
+.fi-line::before {
+    content: attr(data-line-num);
+    position: absolute;
+    right: calc(100% + 16px);
+    width: 40px;
+    color: var(--fi-gutter-text);
+    text-align: right;
+    user-select: none;
+}
+
+.formatter-input::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 48px;
+    background: var(--fi-gutter-bg);
+    border-right: 1px solid var(--fi-border);
+    z-index: 0;
+}
+
+.formatter-input-textarea {
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    resize: none;
+    background: transparent;
+    color: transparent;
+    caret-color: var(--fi-text);
+    outline: none;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.formatter-input-textarea::selection {
+    background: rgba(37, 99, 235, 0.22);
+    color: transparent;
+}
+
+.formatter-input-textarea::placeholder {
+    color: var(--fi-muted);
+    opacity: 1;
+}
+
+.fi-search-bar {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid var(--fi-border);
+    border-radius: 10px;
+    background: var(--fi-bg);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    font-family: system-ui, sans-serif;
+}
+
+.fi-search-input {
+    width: 160px;
+    border: 1px solid var(--fi-border);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+
+.fi-search-count {
+    color: var(--fi-muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.fi-search-nav,
+.fi-search-close {
+    border: 0;
+    border-radius: 6px;
+    padding: 3px 7px;
+    background: transparent;
+    color: var(--fi-text);
+    cursor: pointer;
+}
+
+.fi-search-nav:hover,
+.fi-search-close:hover {
+    background: var(--fi-gutter-bg);
+}
+
+.fi-match {
+    border-radius: 3px;
+    background: var(--fi-match);
+    color: inherit;
+}
+
+.fi-match-current {
+    box-shadow: inset 0 0 0 1px var(--fi-current);
+}
+
+.formatter-input .token.comment,
+.formatter-input .token.prolog,
+.formatter-input .token.doctype,
+.formatter-input .token.cdata {
+    color: #6b7280;
+}
+
+.formatter-input .token.punctuation {
+    color: #64748b;
+}
+
+.formatter-input .token.property,
+.formatter-input .token.tag,
+.formatter-input .token.boolean,
+.formatter-input .token.number,
+.formatter-input .token.constant,
+.formatter-input .token.symbol {
+    color: #b45309;
+}
+
+.formatter-input .token.selector,
+.formatter-input .token.attr-name,
+.formatter-input .token.string,
+.formatter-input .token.char,
+.formatter-input .token.builtin {
+    color: #047857;
+}
+
+.formatter-input .token.operator,
+.formatter-input .token.entity,
+.formatter-input .token.url {
+    color: #0f766e;
+}
+
+.formatter-input .token.atrule,
+.formatter-input .token.attr-value,
+.formatter-input .token.keyword {
+    color: #1d4ed8;
+}
+
+.formatter-input .token.function,
+.formatter-input .token.class-name {
+    color: #7c3aed;
+}
+
+@media (max-width: 640px) {
+    .formatter-input-scroll,
+    .formatter-input-textarea {
+        padding: 12px 12px 12px 48px;
+    }
+
+    .formatter-input::before {
+        width: 42px;
+    }
+
+    .fi-line::before {
+        right: calc(100% + 12px);
+        width: 34px;
+    }
+
+    .fi-search-bar {
+        left: 8px;
+        right: 8px;
+    }
+
+    .fi-search-input {
+        min-width: 0;
+        flex: 1;
+    }
+}

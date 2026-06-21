@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Select, Upload } from 'antd'
 import { Clipboard, Download, FileUp, LetterText, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -39,5 +40,5 @@ export default function CaseConverterTool() {
     const copy = async () => { const copyResult = await copyText(result || value); message[copyResult.ok ? 'success' : 'warning'](copyResult.message) }
     const actions = useMemo(() => <><Upload beforeUpload={openFile} showUploadList={false} accept=".txt,.md,.log"><Button icon={<FileUp size={16} />}>Open</Button></Upload><Button icon={<LetterText size={16} />} type="primary" onClick={run}>Convert</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'converted-case.txt')}>Download</Button><Button icon={<RotateCcw size={16} />} onClick={() => { setValue(caseConverterExample); setResult('') }}>Example</Button></>, [value, result, mode])
     useToolActions(actions)
-    return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><label className="tool-function-label" htmlFor="case-mode">Mode</label><Select id="case-mode" aria-label="Mode" size="small" value={mode} onChange={setMode} options={modes.map((item) => ({ label: item, value: item }))} style={{ minWidth: 160 }} /></>} left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<FormatterOutput code={result} language="text" />} /></div>
+    return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><label className="tool-function-label" htmlFor="case-mode">Mode</label><Select id="case-mode" aria-label="Mode" size="small" value={mode} onChange={setMode} options={modes.map((item) => ({ label: item, value: item }))} style={{ minWidth: 160 }} /></>} left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<FormatterOutput code={result} language="text" />} /></div>
 }

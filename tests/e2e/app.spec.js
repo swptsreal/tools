@@ -371,27 +371,25 @@ test('shows line numbers beside JSON compare editors', async ({ page }) => {
   "name": "Useful Tools"
 }`)
 
-    await expect(firstEditor.locator('.json-compare-line-number')).toHaveText([
-        '1',
-        '2',
-        '3'
-    ])
+    await expect(firstEditor.locator('.fi-line')).toHaveCount(3)
+    await expect(firstEditor.locator('.fi-line').first()).toHaveAttribute('data-line-num', '1')
+    await expect(firstEditor.locator('.fi-line').nth(2)).toHaveAttribute('data-line-num', '3')
 
     const metrics = await firstEditor.evaluate((element) => {
-        const gutter = element
-            .querySelector('.json-compare-line-gutter')
+        const firstLine = element
+            .querySelector('.fi-line')
             ?.getBoundingClientRect()
         const textarea = element
             .querySelector('textarea')
             ?.getBoundingClientRect()
 
         return {
-            gutterRight: gutter?.right ?? 0,
+            lineLeft: firstLine?.left ?? 0,
             textareaLeft: textarea?.left ?? 0
         }
     })
 
-    expect(metrics.gutterRight).toBeLessThanOrEqual(metrics.textareaLeft)
+    expect(metrics.lineLeft).toBeGreaterThanOrEqual(metrics.textareaLeft)
 })
 
 test('lays out JSON compare without splitter and gives results 45 percent', async ({ page }) => {
@@ -448,6 +446,37 @@ for (const viewport of breakpoints) {
         }
     })
 }
+
+
+// ── FormatterInput shared editor tests ───────────────────────────────────────
+
+test('formatter input shows line numbers and keeps textarea editing', async ({ page }) => {
+    await page.goto('/tools/html-formatter')
+    const editor = page.locator('.formatter-input').first()
+    await page.locator('textarea').fill('<main>\n  <h1>Useful Tools</h1>\n</main>')
+
+    await expect(editor.locator('.fi-line')).toHaveCount(3)
+    await expect(editor.locator('.fi-line').first()).toHaveAttribute('data-line-num', '1')
+    await expect(page.locator('textarea')).toHaveValue('<main>\n  <h1>Useful Tools</h1>\n</main>')
+})
+
+test('formatter input search opens on Ctrl+F and highlights matches', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"name":"Useful Tools","items":[1,2]}')
+    await page.locator('.formatter-input').press('Control+f')
+
+    await expect(page.locator('.fi-search-bar')).toBeVisible()
+    await page.locator('.fi-search-input').fill('items')
+    await expect(page.locator('.fi-match')).toHaveCount(1)
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.fi-search-bar')).not.toBeVisible()
+})
+
+test('formatter input renders syntax-highlighted tokens', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"key":"value"}')
+    await expect(page.locator('.formatter-input-highlight .token.string').first()).toBeVisible()
+})
 
 // ── Phase 4: FormatterOutput enhanced output tests ──────────────────────────
 
@@ -657,6 +686,28 @@ test('wraps long formatter output tokens without horizontal overflow', async ({ 
     }))
 
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1)
+})
+
+
+test('wraps long formatter input tokens without horizontal overflow', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/tools/json-formatter')
+
+    const longValue = `{"token":"${'x'.repeat(360)}"}`
+    await page.locator('textarea').fill(longValue)
+
+    const inputWrap = page.locator('.formatter-input').first()
+    await expect(inputWrap).toContainText('x'.repeat(120))
+
+    const metrics = await inputWrap.evaluate((node) => ({
+        clientWidth: node.clientWidth,
+        scrollWidth: node.scrollWidth,
+        textareaClientWidth: node.querySelector('textarea')?.clientWidth ?? 0,
+        textareaScrollWidth: node.querySelector('textarea')?.scrollWidth ?? 0,
+    }))
+
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1)
+    expect(metrics.textareaScrollWidth).toBeLessThanOrEqual(metrics.textareaClientWidth + 1)
 })
 
 test('header actions do not repeat options from the function bar', async ({ page }) => {

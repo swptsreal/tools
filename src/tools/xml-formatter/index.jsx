@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, CodeXml, Download, FileUp, RotateCcw, Shrink } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -110,7 +111,7 @@ export default function XmlFormatterTool() {
                     </>
                 )}
                 left={
-                    <Input.TextArea
+                    <FormatterInput language="xml"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}

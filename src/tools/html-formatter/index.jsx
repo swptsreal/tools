@@ -9,6 +9,7 @@ import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { htmlExample } from './example.js'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import './style.css'
 
 const toolId = 'html-formatter'
@@ -80,7 +81,7 @@ export default function HtmlFormatterTool() {
                     </>
                 )}
                 left={
-                    <Input.TextArea
+                    <FormatterInput language="html"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}

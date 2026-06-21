@@ -4,6 +4,7 @@ import { Clipboard, Download, FileJson, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
@@ -138,7 +139,7 @@ export default function JsonYamlConverterTool() {
                         <Radio.Group optionType="button" size="small" value={direction} onChange={(event) => setDirection(event.target.value)} options={[{ label: 'JSON to YAML', value: 'JSON to YAML' }, { label: 'YAML to JSON', value: 'YAML to JSON' }]} />
                     </>
                 )}
-                left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
+                left={<FormatterInput language="json" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="converter-error">{error}</pre> : <FormatterOutput code={result} language={language} />}
             />
         </div>

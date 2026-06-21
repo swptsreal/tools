@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
@@ -62,7 +63,7 @@ export default function WordCharacterCounterTool() {
     return (
         <div className="tool-page text-tool-page">
             <SplitWorkspace
-                left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
+                left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={(
                     <div className="text-stats-grid">
                         <Card><strong>Characters</strong><span data-testid="stat-characters">{stats.characters}</span></Card>

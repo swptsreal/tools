@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileUp, RotateCcw } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
+import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -104,7 +105,7 @@ export default function HtmlEntityEncoderDecoderTool() {
                         <Radio.Group optionType="button" size="small" value={entityStyle} onChange={(event) => setEntityStyle(event.target.value)} options={[{ label: 'Named', value: 'Named' }, { label: 'Numeric', value: 'Numeric' }]} />
                     </>
                 )}
-                left={<Input.TextArea className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
+                left={<FormatterInput language="html" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={error ? <pre className="encoder-error">{error}</pre> : <FormatterOutput code={result} language="html" />}
             />
         </div>

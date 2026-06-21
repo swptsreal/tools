@@ -37,6 +37,7 @@ export function AppLayout() {
                 open={isNavOpen}
                 onClose={() => setIsNavOpen(false)}
                 closeIcon={null}
+                size={266}
                 destroyOnHidden
             >
                 <Sidebar

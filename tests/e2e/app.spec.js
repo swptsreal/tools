@@ -46,6 +46,34 @@ async function expectEditorFillsLeftPanel(page) {
     expect(layout.editorWidth).toBeGreaterThanOrEqual(layout.panelWidth - 2)
 }
 
+
+test('uses slim scrollbars across app scroll containers', async ({ page, browserName }) => {
+    test.skip(browserName !== 'chromium', 'webkit scrollbar styling is only observable in Chromium')
+
+    await page.goto('/tools/text-diff')
+
+    const styles = await page.locator('.app-sidebar').evaluate((element) => {
+        const root = getComputedStyle(document.documentElement)
+        const sidebar = getComputedStyle(element)
+        const scrollbar = getComputedStyle(element, '::-webkit-scrollbar')
+        const thumb = getComputedStyle(element, '::-webkit-scrollbar-thumb')
+
+        return {
+            rootWidth: root.scrollbarWidth,
+            sidebarWidth: sidebar.scrollbarWidth,
+            webkitWidth: scrollbar.width,
+            webkitHeight: scrollbar.height,
+            thumbColor: thumb.backgroundColor
+        }
+    })
+
+    expect(styles.rootWidth).toBe('thin')
+    expect(styles.sidebarWidth).toBe('thin')
+    expect(Number.parseFloat(styles.webkitWidth)).toBeLessThanOrEqual(6)
+    expect(Number.parseFloat(styles.webkitHeight)).toBeLessThanOrEqual(6)
+    expect(styles.thumbColor).not.toBe('rgba(0, 0, 0, 0)')
+})
+
 test('opens the default Mermaid tool and renders a diagram', async ({ page }) => {
     await page.goto('/')
 
@@ -470,6 +498,43 @@ test('formatter input search opens on Ctrl+F and highlights matches', async ({ p
     await expect(page.locator('.fi-match')).toHaveCount(1)
     await page.keyboard.press('Escape')
     await expect(page.locator('.fi-search-bar')).not.toBeVisible()
+})
+
+
+
+test('formatter input search highlight uses strong colors', async ({ page }) => {
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"name":"Useful Tools","items":[1,2]}')
+    await page.locator('.formatter-input').press('Control+f')
+    await page.locator('.fi-search-input').fill('items')
+    await expect(page.locator('.fi-match')).toHaveCount(1)
+
+    const colors = await page.locator('.fi-match').first().evaluate((node) => {
+        const style = window.getComputedStyle(node)
+        return {
+            background: style.backgroundColor,
+            color: style.color,
+            fontWeight: style.fontWeight,
+        }
+    })
+
+    expect(colors.background).toBe('rgb(120, 53, 15)')
+    expect(colors.color).toBe('rgb(255, 255, 255)')
+    expect(Number(colors.fontWeight)).toBeGreaterThanOrEqual(700)
+})
+
+test('formatter input search debounces highlights by 200ms', async ({ page }) => {
+    await page.clock.install()
+    await page.goto('/tools/json-formatter')
+    await page.locator('textarea').fill('{"name":"Useful Tools","items":[1,2]}')
+    await page.locator('.formatter-input').press('Control+f')
+    await page.locator('.fi-search-input').fill('items')
+
+    expect(await page.locator('.fi-match').count()).toBe(0)
+    await page.clock.fastForward(100)
+    expect(await page.locator('.fi-match').count()).toBe(0)
+    await page.clock.fastForward(100)
+    await expect(page.locator('.fi-match')).toHaveCount(1)
 })
 
 test('formatter input renders syntax-highlighted tokens', async ({ page }) => {
@@ -992,6 +1057,30 @@ test('case converter converts text to multiple cases', async ({ page }) => {
     await page.getByRole('button', { name: 'Convert' }).click()
 
     await expect(page.locator('.fo-code')).toHaveText('HelloUsefulTools')
+})
+
+
+test('text diff uses dedicated layout without splitter overflow on short text', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/tools/text-diff')
+
+    await expect(page.locator('.split-workspace')).toHaveCount(0)
+    await expect(page.locator('.text-diff-workspace')).toBeVisible()
+
+    const editors = page.locator('textarea')
+    await editors.nth(0).fill('a')
+    await editors.nth(1).fill('b')
+    await page.getByRole('button', { name: 'Compare' }).click()
+
+    const metrics = await page.locator('.text-diff-workspace').evaluate((node) => ({
+        workspaceWidth: node.clientWidth,
+        workspaceScrollWidth: node.scrollWidth,
+        pageWidth: document.documentElement.clientWidth,
+        pageScrollWidth: document.documentElement.scrollWidth,
+    }))
+
+    expect(metrics.workspaceScrollWidth).toBeLessThanOrEqual(metrics.workspaceWidth + 1)
+    expect(metrics.pageScrollWidth).toBeLessThanOrEqual(metrics.pageWidth + 1)
 })
 
 test('text diff shows added and removed lines', async ({ page }) => {

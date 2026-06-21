@@ -107,6 +107,7 @@ export default function FormatterInput({ value, onChange, language = 'text', cla
     const [highlighted, setHighlighted] = useState('')
     const [searchOpen, setSearchOpen] = useState(false)
     const [query, setQuery] = useState('')
+    const [debouncedQuery, setDebouncedQuery] = useState('')
     const [currentMatch, setCurrentMatch] = useState(0)
     const searchInputRef = useRef(null)
     const textareaRef = useRef(null)
@@ -124,20 +125,25 @@ export default function FormatterInput({ value, onChange, language = 'text', cla
         if (searchOpen) searchInputRef.current?.focus()
     }, [searchOpen])
 
+    useEffect(() => {
+        const timeout = window.setTimeout(() => setDebouncedQuery(query), 200)
+        return () => window.clearTimeout(timeout)
+    }, [query])
+
     const lines = useMemo(() => splitHighlightedLines(highlighted, value), [highlighted, value])
     const plainLines = useMemo(() => value.split('\n'), [value])
 
     const matchData = useMemo(() => {
-        if (!query) return { total: 0, offsets: lines.map(() => 0) }
+        if (!debouncedQuery) return { total: 0, offsets: lines.map(() => 0) }
         let total = 0
-        const re = new RegExp(escapeRegex(query), 'gi')
+        const re = new RegExp(escapeRegex(debouncedQuery), 'gi')
         const offsets = plainLines.map((line) => {
             const offset = total
             total += line.match(re)?.length ?? 0
             return offset
         })
         return { total, offsets }
-    }, [lines, plainLines, query])
+    }, [debouncedQuery, lines, plainLines])
 
     const clampedMatch = matchData.total ? Math.min(currentMatch, matchData.total - 1) : 0
 
@@ -160,6 +166,7 @@ export default function FormatterInput({ value, onChange, language = 'text', cla
         if (event.key === 'Escape') {
             setSearchOpen(false)
             setQuery('')
+            setDebouncedQuery('')
             setCurrentMatch(0)
             textareaRef.current?.focus()
         } else if (event.key === 'Enter') {
@@ -188,16 +195,16 @@ export default function FormatterInput({ value, onChange, language = 'text', cla
                         onChange={(event) => { setQuery(event.target.value); setCurrentMatch(0) }}
                         onKeyDown={onSearchKeyDown}
                     />
-                    {query && <span className="fi-search-count">{matchData.total === 0 ? 'No results' : `${clampedMatch + 1} / ${matchData.total}`}</span>}
+                    {debouncedQuery && <span className="fi-search-count">{matchData.total === 0 ? 'No results' : `${clampedMatch + 1} / ${matchData.total}`}</span>}
                     <button className="fi-search-nav" onClick={goPrev} title="Previous">↑</button>
                     <button className="fi-search-nav" onClick={goNext} title="Next">↓</button>
-                    <button className="fi-search-close" onClick={() => { setSearchOpen(false); setQuery(''); setCurrentMatch(0); textareaRef.current?.focus() }}>×</button>
+                    <button className="fi-search-close" onClick={() => { setSearchOpen(false); setQuery(''); setDebouncedQuery(''); setCurrentMatch(0); textareaRef.current?.focus() }}>×</button>
                 </div>
             )}
             <div className="formatter-input-scroll" ref={scrollRef} aria-hidden="true">
                 <div className="formatter-input-highlight">
                     {lines.map((line, idx) => {
-                        const html = query ? markMatches(line, query, clampedMatch, matchData.offsets[idx]) : line
+                        const html = debouncedQuery ? markMatches(line, debouncedQuery, clampedMatch, matchData.offsets[idx]) : line
                         return (
                             <div key={idx} className="fi-line" data-line-num={idx + 1}>
                                 <span className="fi-code" dangerouslySetInnerHTML={{ __html: html || ' ' }} />

@@ -4,33 +4,75 @@
     flex-direction: column;
 }
 
-.text-diff-inputs {
-    height: 100%;
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    gap: 12px;
+.text-diff-page {
+    min-width: 0;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.text-diff-workspace {
+    flex: 1;
+    min-width: 0;
     min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(280px, 42%) minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+    overflow: hidden;
+}
+
+.text-diff-input-panel,
+.text-diff-result-panel {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+}
+
+.text-diff-input-panel {
+    display: grid;
+    grid-template-rows: minmax(180px, 1fr) minmax(180px, 1fr);
+    gap: 12px;
+    border: 0;
+    background: transparent;
 }
 
 .text-diff-field {
+    min-width: 0;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
 }
 
 .text-diff-field label {
+    flex: 0 0 auto;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f8fafc;
     font-weight: 600;
     color: #475569;
 }
 
 .text-diff-field .tool-editor {
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.text-diff-result-panel {
+    display: flex;
 }
 
 .text-diff-result {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
     height: 100%;
     margin: 0;
+    padding: 10px 0;
     overflow: auto;
     font-family: Consolas, monospace;
     font-size: 14px;
@@ -40,6 +82,7 @@
 .text-diff-row {
     padding: 2px 12px;
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
     word-break: break-word;
 }
 
@@ -55,4 +98,24 @@
 
 .diff-row-same {
     color: #334155;
+}
+
+@media (max-width: 900px) {
+    .text-diff-workspace {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(380px, 58%) minmax(220px, 1fr);
+    }
+}
+
+@media (max-width: 520px) {
+    .text-diff-workspace {
+        padding: 8px;
+        gap: 8px;
+        grid-template-rows: minmax(360px, 60%) minmax(200px, 1fr);
+    }
+
+    .text-diff-input-panel {
+        gap: 8px;
+        grid-template-rows: minmax(160px, 1fr) minmax(160px, 1fr);
+    }
 }

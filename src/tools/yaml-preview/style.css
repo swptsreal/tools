@@ -32,8 +32,15 @@
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
+.yaml-editor-panel {
+    display: flex;
+    flex-direction: column;
+}
+
 .yaml-editor-panel .tool-editor {
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
     border: 0;
     resize: none;
 }
@@ -134,13 +141,9 @@
 }
 
 @media (max-width: 700px) {
-    .yaml-preview-page {
-        overflow: auto;
-    }
-
     .yaml-preview-layout {
-        height: auto;
-        grid-template-rows: 320px minmax(420px, auto);
+        height: 100%;
+        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     }
 
     .yaml-swagger-preview .swagger-ui,

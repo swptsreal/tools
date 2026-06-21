@@ -1,9 +1,106 @@
 import { useMemo, useState } from 'react'
-import { Button, Input } from 'antd'
+import { Button, Input, Select } from 'antd'
 import { Binary } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import './style.css'
-const bases={Binary:2,Octal:8,Decimal:10,Hex:16}
-function parse(value,base){return Number.parseInt(value.trim(),bases[base])}
-export default function NumberBaseConverterTool(){const [value,setValue]=useState('255'); const [base,setBase]=useState('Decimal'); const [n,setN]=useState(255); const run=()=>setN(parse(value,base)); useToolActions(useMemo(()=><Button icon={<Binary size={16}/>} type="primary" onClick={run}>Convert Number</Button>,[value,base])); const ascii=Number.isFinite(n)&&n>=32&&n<=126?String.fromCharCode(n):''; return <div className="tool-page developer-tool-page"><SplitWorkspace leftToolbar={<><label className="tool-function-label" htmlFor="base-number">Number</label><Input id="base-number" aria-label="Number" value={value} onChange={(e)=>setValue(e.target.value)} style={{width:180}}/><label className="tool-function-label" htmlFor="input-base">Input base</label><select id="input-base" aria-label="Input base" value={base} onChange={(e)=>setBase(e.target.value)}>{Object.keys(bases).map(x=><option key={x}>{x}</option>)}</select></>} left={<div className="dev-result"><div className="dev-card">Convert numbers between bases.</div></div>} right={<div className="dev-result"><div className="dev-card"><h3>Binary</h3><p className="dev-mono">{n.toString(2)}</p></div><div className="dev-card"><h3>Decimal</h3><p>{n}</p></div><div className="dev-card"><h3>Hex</h3><p className="dev-mono">{n.toString(16).toUpperCase()}</p></div><div className="dev-card"><h3>Octal</h3><p>{n.toString(8)}</p></div><div className="dev-card"><h3>ASCII</h3><p>{ascii}</p></div></div>} /></div>}
+const bases = { Binary: 2, Octal: 8, Decimal: 10, Hex: 16 }
+function parse(value, base) {
+    return Number.parseInt(value.trim(), bases[base])
+}
+export default function NumberBaseConverterTool() {
+    const [value, setValue] = useState('255')
+    const [base, setBase] = useState('Decimal')
+    const [n, setN] = useState(255)
+    const run = () => setN(parse(value, base))
+    useToolActions(
+        useMemo(
+            () => (
+                <Button
+                    icon={<Binary size={16} />}
+                    type="primary"
+                    onClick={run}
+                >
+                    Convert Number
+                </Button>
+            ),
+            [value, base]
+        )
+    )
+    const ascii =
+        Number.isFinite(n) && n >= 32 && n <= 126 ? String.fromCharCode(n) : ''
+    return (
+        <div className="tool-page developer-tool-page">
+            <SplitWorkspace
+                leftToolbar={
+                    <>
+                        <label
+                            className="tool-function-label"
+                            htmlFor="base-number"
+                        >
+                            Number
+                        </label>
+                        <Input
+                            id="base-number"
+                            aria-label="Number"
+                            value={value}
+                            onChange={(e) => setValue(e.target.value)}
+                            style={{ width: 180 }}
+                        />
+                        <label
+                            className="tool-function-label"
+                            htmlFor="input-base"
+                        >
+                            Input base
+                        </label>
+                        <Select
+                            id="input-base"
+                            aria-label="Input base"
+                            size="small"
+                            value={base}
+                            onChange={setBase}
+                            options={Object.keys(bases).map((x) => ({
+                                value: x,
+                                label: x
+                            }))}
+                            style={{ width: 140 }}
+                        />
+                    </>
+                }
+                left={
+                    <div className="dev-result">
+                        <div className="dev-card">
+                            Convert numbers between bases.
+                        </div>
+                    </div>
+                }
+                right={
+                    <div className="dev-result">
+                        <div className="dev-card">
+                            <h3>Binary</h3>
+                            <p className="dev-mono">{n.toString(2)}</p>
+                        </div>
+                        <div className="dev-card">
+                            <h3>Decimal</h3>
+                            <p>{n}</p>
+                        </div>
+                        <div className="dev-card">
+                            <h3>Hex</h3>
+                            <p className="dev-mono">
+                                {n.toString(16).toUpperCase()}
+                            </p>
+                        </div>
+                        <div className="dev-card">
+                            <h3>Octal</h3>
+                            <p>{n.toString(8)}</p>
+                        </div>
+                        <div className="dev-card">
+                            <h3>ASCII</h3>
+                            <p>{ascii}</p>
+                        </div>
+                    </div>
+                }
+            />
+        </div>
+    )
+}

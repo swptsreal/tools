@@ -1181,13 +1181,24 @@ test('url parser splits and rebuilds URLs', async ({ page }) => {
 })
 
 
+async function selectAntdOption(page, selectId, option) {
+    await page.locator(`.ant-select:has(#${selectId})`).click()
+    await page.locator(`.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option[title="${option}"]`).last().click()
+}
+
 test('unit converter converts common units offline', async ({ page }) => {
     await page.goto('/tools/unit-converter')
     await expect(page.getByRole('heading', { name: 'Unit Converter' })).toBeVisible()
     await page.getByLabel('Value').fill('1000')
-    await page.getByLabel('Category').selectOption('Length')
-    await page.getByLabel('From unit').selectOption('Meter')
-    await page.getByLabel('To unit').selectOption('Kilometer')
+    await expect(page.locator('select#unit-category')).toHaveCount(0)
+    await expect(page.locator('.ant-select:has(#unit-category)')).toBeVisible()
+    await expect(page.locator('select#unit-from')).toHaveCount(0)
+    await expect(page.locator('.ant-select:has(#unit-from)')).toBeVisible()
+    await expect(page.locator('select#unit-to')).toHaveCount(0)
+    await expect(page.locator('.ant-select:has(#unit-to)')).toBeVisible()
+    await selectAntdOption(page, 'unit-category', 'Length')
+    await selectAntdOption(page, 'unit-from', 'Meter')
+    await selectAntdOption(page, 'unit-to', 'Kilometer')
     await page.getByRole('button', { name: 'Convert' }).click()
     await expect(page.getByText('1 Kilometer')).toBeVisible()
 })
@@ -1196,7 +1207,9 @@ test('number base converter converts decimal to other bases', async ({ page }) =
     await page.goto('/tools/number-base-converter')
     await expect(page.getByRole('heading', { name: 'Number Base Converter' })).toBeVisible()
     await page.getByLabel('Number').fill('255')
-    await page.getByLabel('Input base').selectOption('Decimal')
+    await expect(page.locator('select#input-base')).toHaveCount(0)
+    await expect(page.locator('.ant-select:has(#input-base)')).toBeVisible()
+    await selectAntdOption(page, 'input-base', 'Decimal')
     await page.getByRole('button', { name: 'Convert Number' }).click()
     await expect(page.getByRole('heading', { name: 'Binary' })).toBeVisible()
     await expect(page.getByText('11111111')).toBeVisible()
@@ -1206,13 +1219,43 @@ test('number base converter converts decimal to other bases', async ({ page }) =
 test('escape unescape converts JSON strings', async ({ page }) => {
     await page.goto('/tools/escape-unescape')
     await expect(page.getByRole('heading', { name: 'Escape / Unescape' })).toBeVisible()
-    await page.getByLabel('Mode').selectOption('JSON string')
-    await page.getByLabel('Direction').selectOption('Escape')
+    await expect(page.locator('select#escape-mode')).toHaveCount(0)
+    await expect(page.locator('.ant-select:has(#escape-mode)')).toBeVisible()
+    await expect(page.locator('select#escape-direction')).toHaveCount(0)
+    await expect(page.locator('.ant-select:has(#escape-direction)')).toBeVisible()
+    await selectAntdOption(page, 'escape-mode', 'JSON string')
+    await selectAntdOption(page, 'escape-direction', 'Escape')
     await page.locator('textarea').fill('Hello "Useful" Tools')
     await page.getByRole('button', { name: 'Run Escape' }).click()
     await expect(page.locator('.fo-code')).toHaveText('Hello \\"Useful\\" Tools')
 })
 
+
+
+test('YAML formatter input stays between toolbar and footer', async ({ page }) => {
+    await page.setViewportSize({ width: 633, height: 411 })
+    await page.goto('/tools/yaml-preview')
+    await page.waitForSelector('.yaml-editor-panel .formatter-input')
+
+    const metrics = await page.evaluate(() => {
+        const toolbar = document.querySelector('.yaml-editor-panel .tool-function-bar').getBoundingClientRect()
+        const editor = document.querySelector('.yaml-editor-panel .formatter-input').getBoundingClientRect()
+        const panel = document.querySelector('.yaml-editor-panel').getBoundingClientRect()
+        const footer = document.querySelector('.app-footer').getBoundingClientRect()
+
+        return {
+            toolbarBottom: toolbar.bottom,
+            editorTop: editor.top,
+            editorBottom: editor.bottom,
+            panelBottom: panel.bottom,
+            footerTop: footer.top
+        }
+    })
+
+    expect(metrics.editorTop).toBeGreaterThanOrEqual(metrics.toolbarBottom - 1)
+    expect(metrics.panelBottom).toBeLessThanOrEqual(metrics.footerTop + 1)
+    expect(metrics.editorBottom).toBeLessThanOrEqual(metrics.panelBottom + 1)
+})
 
 test('YAML Preview renders OpenAPI docs offline', async ({ page }) => {
     await page.goto('/tools/yaml-preview')

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Upload } from 'antd'
-import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, FileUp, RotateCcw, Share2 } from 'lucide-react'
+import pako from 'pako'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -14,17 +15,50 @@ import { MarkdownPreview } from './Preview.jsx'
 import './markdown.css'
 import './style.css'
 import RevertExample from '../../shared/components/RevertExample.jsx'
+import { deserializeState, serializeState } from '../../shared/utils/share.js'
 
 const toolId = 'markdown-preview'
 
+const getInitialState = () => {
+    if (window.location.hash) {
+        const state = deserializeState(window.location.hash)
+        if (state && typeof state.code === 'string') {
+            return {
+                code: state.code,
+                lineBreaks:
+                    typeof state.lineBreaks === 'boolean'
+                        ? state.lineBreaks
+                        : false
+            }
+        }
+    }
+    const draft = loadDraft(toolId, markdownExample)
+    return { code: draft, lineBreaks: false }
+}
+
 export default function MarkdownPreviewTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, markdownExample))
-    const [lineBreaks, setLineBreaks] = useState(false)
+    const [initialState] = useState(() => getInitialState())
+    const [value, setValue] = useState(initialState.code)
+    const [lineBreaks, setLineBreaks] = useState(initialState.lineBreaks)
     const debouncedValue = useDebouncedValue(value, 300)
 
     useEffect(() => {
         saveDraft(toolId, value)
     }, [value])
+
+    useEffect(() => {
+        if (debouncedValue) {
+            const base64url = serializeState({
+                code: debouncedValue,
+                lineBreaks: lineBreaks
+            })
+            if (base64url) {
+                window.history.replaceState(null, '', `#pako:${base64url}`)
+            }
+        } else {
+            window.history.replaceState(null, '', window.location.pathname)
+        }
+    }, [debouncedValue, lineBreaks])
 
     const openFile = async (file) => {
         setValue(await readTextFile(file))
@@ -35,6 +69,13 @@ export default function MarkdownPreviewTool() {
     const copy = async () => {
         const result = await copyText(value)
         message[result.ok ? 'success' : 'warning'](result.message)
+    }
+
+    const share = async () => {
+        const result = await copyText(window.location.href)
+        message[result.ok ? 'success' : 'warning'](
+            result.ok ? 'Đã sao chép liên kết chia sẻ.' : result.message
+        )
     }
 
     const actions = useMemo(
@@ -59,9 +100,16 @@ export default function MarkdownPreviewTool() {
                     Download
                 </Button>
                 <RevertExample onClick={() => setValue(markdownExample)} />
+                <Button
+                    type="primary"
+                    icon={<Share2 size={16} />}
+                    onClick={share}
+                >
+                    Share
+                </Button>
             </>
         ),
-        [value]
+        [value, lineBreaks]
     )
 
     useToolActions(actions)
@@ -90,7 +138,12 @@ export default function MarkdownPreviewTool() {
                         spellCheck={false}
                     />
                 }
-                right={<MarkdownPreview value={debouncedValue} />}
+                right={
+                    <MarkdownPreview
+                        value={debouncedValue}
+                        lineBreaks={lineBreaks}
+                    />
+                }
             />
         </div>
     )

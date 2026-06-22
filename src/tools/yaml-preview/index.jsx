@@ -6,6 +6,7 @@ import {
     FileCode2,
     FileUp,
     RotateCcw,
+    Share2,
     Shrink,
     Wand2
 } from 'lucide-react'
@@ -22,8 +23,28 @@ import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { yamlPreviewExample } from './example.js'
 import './style.css'
 import RevertExample from '../../shared/components/RevertExample.jsx'
+import { deserializeState, serializeState } from '../../shared/utils/share.js'
 
 const toolId = 'yaml-preview'
+
+const getInitialState = () => {
+    if (window.location.hash) {
+        const state = deserializeState(window.location.hash)
+        if (state && typeof state.code === 'string') {
+            return {
+                code: state.code,
+                indentSize:
+                    typeof state.indentSize === 'number' ? state.indentSize : 2,
+                autoPreview:
+                    typeof state.autoPreview === 'boolean'
+                        ? state.autoPreview
+                        : true
+            }
+        }
+    }
+    const draft = loadDraft(toolId, yamlPreviewExample)
+    return { code: draft, indentSize: 2, autoPreview: true }
+}
 
 function parseYaml(value) {
     const doc = parseDocument(value, { prettyErrors: false })
@@ -137,12 +158,11 @@ function YamlPreviewContent({ state }) {
 }
 
 export default function YamlPreviewTool() {
-    const [value, setValue] = useState(() =>
-        loadDraft(toolId, yamlPreviewExample)
-    )
-    const [previewValue, setPreviewValue] = useState(value)
-    const [indentSize, setIndentSize] = useState(2)
-    const [autoPreview, setAutoPreview] = useState(true)
+    const [initialState] = useState(() => getInitialState())
+    const [value, setValue] = useState(initialState.code)
+    const [previewValue, setPreviewValue] = useState(initialState.code)
+    const [indentSize, setIndentSize] = useState(initialState.indentSize)
+    const [autoPreview, setAutoPreview] = useState(initialState.autoPreview)
     const debouncedValue = useDebouncedValue(value, 250)
 
     useEffect(() => {
@@ -152,6 +172,21 @@ export default function YamlPreviewTool() {
     useEffect(() => {
         if (autoPreview) setPreviewValue(debouncedValue)
     }, [autoPreview, debouncedValue])
+
+    useEffect(() => {
+        if (debouncedValue) {
+            const base64url = serializeState({
+                code: debouncedValue,
+                indentSize: indentSize,
+                autoPreview: autoPreview
+            })
+            if (base64url) {
+                window.history.replaceState(null, '', `#pako:${base64url}`)
+            }
+        } else {
+            window.history.replaceState(null, '', window.location.pathname)
+        }
+    }, [debouncedValue, indentSize, autoPreview])
 
     const previewState = useMemo(() => {
         try {
@@ -182,17 +217,6 @@ export default function YamlPreviewTool() {
         }
     }
 
-    const validate = () => {
-        try {
-            parseYaml(value)
-            message.success('Valid YAML')
-            setPreviewValue(value)
-        } catch (err) {
-            message.error(`Invalid YAML: ${err.message}`)
-            setPreviewValue(value)
-        }
-    }
-
     const openFile = async (file) => {
         const nextValue = await readTextFile(file)
         updateYaml(nextValue)
@@ -203,6 +227,13 @@ export default function YamlPreviewTool() {
     const copy = async () => {
         const copyResult = await copyText(value)
         message[copyResult.ok ? 'success' : 'warning'](copyResult.message)
+    }
+
+    const share = async () => {
+        const result = await copyText(window.location.href)
+        message[result.ok ? 'success' : 'warning'](
+            result.ok ? 'Đã sao chép liên kết chia sẻ.' : result.message
+        )
     }
 
     const resetExample = () => updateYaml(yamlPreviewExample)
@@ -236,7 +267,6 @@ export default function YamlPreviewTool() {
                 >
                     Minify
                 </Button>
-                <Button onClick={validate}>Validate</Button>
                 <Button icon={<Clipboard size={16} />} onClick={copy}>
                     Copy
                 </Button>
@@ -253,16 +283,13 @@ export default function YamlPreviewTool() {
                     Download
                 </Button>
                 <RevertExample onClick={resetExample} />
-                <label className="yaml-auto-preview-toggle">
-                    <input
-                        type="checkbox"
-                        checked={autoPreview}
-                        onChange={(event) =>
-                            setAutoPreview(event.target.checked)
-                        }
-                    />
-                    <span>Auto preview</span>
-                </label>
+                <Button
+                    type="primary"
+                    icon={<Share2 size={16} />}
+                    onClick={share}
+                >
+                    Share
+                </Button>
             </>
         ),
         [autoPreview, indentSize, value]
@@ -292,6 +319,16 @@ export default function YamlPreviewTool() {
                                 { label: '4 spaces', value: 4 }
                             ]}
                         />
+                        <label className="yaml-auto-preview-toggle">
+                            <input
+                                type="checkbox"
+                                checked={autoPreview}
+                                onChange={(event) =>
+                                    setAutoPreview(event.target.checked)
+                                }
+                            />
+                            <span>Auto preview</span>
+                        </label>
                     </div>
                     <FormatterInput
                         language="yaml"

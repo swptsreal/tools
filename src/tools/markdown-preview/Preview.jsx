@@ -24,13 +24,13 @@ function decodeHtml(html) {
     return textarea.value
 }
 
-export function MarkdownPreview({ value }) {
+export function MarkdownPreview({ value, lineBreaks }) {
     const [html, setHtml] = useState('')
 
     useEffect(() => {
         let cancelled = false
         async function renderPreview() {
-            let nextHtml = parse(value)
+            let nextHtml = parse(value, { breaks: lineBreaks })
             const matches = [...nextHtml.matchAll(/<code class="language-mermaid">([\s\S]*?)<\/code>/g)]
 
             for (let index = 0; index < matches.length; index += 1) {

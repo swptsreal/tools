@@ -305,6 +305,61 @@ test('debounces preview rendering while editing markdown textarea', async ({ pag
     await expect(page.locator('.markdown-preview h1')).toContainText('Debounced Render')
 })
 
+test('Markdown Preview updates URL hash on edit and loads state from URL hash', async ({ page }) => {
+    await page.goto('/tools/markdown-preview')
+
+    // Fill textarea
+    await page.locator('textarea').fill('# Test Markdown Share\n\n- Bullet 1\n- Bullet 2')
+
+    // Wait for the preview to render the new value (ensuring debounced state has updated)
+    await expect(page.locator('.markdown-preview h1')).toContainText('Test Markdown Share')
+
+    // Wait for the URL to contain `#pako:`
+    await expect(page).toHaveURL(/#pako:/)
+    const sharedUrl = page.url()
+
+    // Now navigate to a different tool to reset state
+    await page.goto('/tools/json-formatter')
+    await expect(page.getByRole('heading', { name: 'JSON Formatter' })).toBeVisible()
+
+    // Now go back directly to the sharedUrl
+    await page.goto(sharedUrl)
+    await expect(page.getByRole('heading', { name: 'Markdown Preview' })).toBeVisible()
+
+    // Verify textarea has the loaded value
+    await expect(page.locator('textarea')).toHaveValue('# Test Markdown Share\n\n- Bullet 1\n- Bullet 2')
+})
+
+test('Markdown Preview handles lineBreaks state sync and Share button copy action', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.goto('/tools/markdown-preview')
+
+    // Toggle line breaks
+    await page.getByLabel('Line breaks').check()
+
+    // Fill textarea
+    await page.locator('textarea').fill('First line\nSecond line')
+
+    // Wait for URL hash
+    await expect(page).toHaveURL(/#pako:/)
+    const sharedUrl = page.url()
+
+    // Click Share button
+    await page.getByRole('button', { name: 'Share' }).click()
+
+    // Verify toast message
+    await expect(page.locator('.ant-message-success')).toContainText('Đã sao chép liên kết chia sẻ.')
+
+    // Verify clipboard value matches URL
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
+    expect(clipboardText).toBe(sharedUrl)
+
+    // Load the URL in a new context or navigate directly
+    await page.goto(sharedUrl)
+    await expect(page.getByLabel('Line breaks')).toBeChecked()
+    await expect(page.locator('textarea')).toHaveValue('First line\nSecond line')
+})
+
 test('uses grid background only for Mermaid preview', async ({ page }) => {
     await page.goto('/tools/mermaid-preview')
 
@@ -1378,6 +1433,65 @@ test('YAML Preview manual preview works when auto preview is disabled', async ({
 
     await page.getByRole('button', { name: 'Preview' }).click()
     await expect(page.locator('.yaml-tree-preview')).toContainText('Manual Preview')
+})
+
+test('YAML Preview updates URL hash on edit and loads state from URL hash', async ({ page }) => {
+    await page.goto('/tools/yaml-preview')
+
+    // Fill textarea
+    await page.locator('textarea').fill('project:\n  name: Test YAML Share\n  version: 1.0.0')
+
+    // Wait for the preview to render the new value (ensuring debounced state has updated)
+    await expect(page.locator('.yaml-tree-preview')).toContainText('Test YAML Share')
+
+    // Wait for the URL to contain `#pako:`
+    await expect(page).toHaveURL(/#pako:/)
+    const sharedUrl = page.url()
+
+    // Now navigate to a different tool to reset state
+    await page.goto('/tools/json-formatter')
+    await expect(page.getByRole('heading', { name: 'JSON Formatter' })).toBeVisible()
+
+    // Now go back directly to the sharedUrl
+    await page.goto(sharedUrl)
+    await expect(page.getByRole('heading', { name: 'YAML Preview' })).toBeVisible()
+
+    // Verify textarea has the loaded value
+    await expect(page.locator('textarea')).toHaveValue('project:\n  name: Test YAML Share\n  version: 1.0.0')
+})
+
+test('YAML Preview handles options state sync and Share button copy action', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.goto('/tools/yaml-preview')
+
+    // Change indent to 4 spaces
+    await page.getByText('4 spaces', { exact: true }).click()
+
+    // Uncheck Auto preview
+    await page.getByLabel('Auto preview').uncheck()
+
+    // Fill textarea
+    await page.locator('textarea').fill('name: Options Check')
+
+    // Wait for URL hash
+    await expect(page).toHaveURL(/#pako:/)
+    const sharedUrl = page.url()
+
+    // Click Share button
+    await page.getByRole('button', { name: 'Share' }).click()
+
+    // Verify toast message
+    await expect(page.locator('.ant-message-success')).toContainText('Đã sao chép liên kết chia sẻ.')
+
+    // Verify clipboard value matches URL
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
+    expect(clipboardText).toBe(sharedUrl)
+
+    // Load the URL in a new context or navigate directly
+    await page.goto(sharedUrl)
+    await expect(page.locator('.ant-radio-button-wrapper-checked')).toContainText('4 spaces')
+    await expect(page.getByLabel('Auto preview')).not.toBeChecked()
+    await expect(page.locator('textarea')).toHaveValue('name: Options Check')
 })
 
 test('YAML Preview avoids horizontal overflow at core breakpoints', async ({ page }) => {

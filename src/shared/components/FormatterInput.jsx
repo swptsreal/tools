@@ -1,10 +1,11 @@
 import { theme } from 'antd'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import './FormatterInput.css'
 
 const { useToken } = theme
 
 const PRISM_LANG = { json: 'json', sql: 'sql', html: 'markup', xml: 'markup', css: 'css', yaml: 'yaml', markdown: 'markdown', javascript: 'javascript', text: 'plain' }
+const prismCache = new Map()
 
 function escapeHtml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -18,20 +19,32 @@ function stripTags(html) {
     return html.replace(/<[^>]*>/g, '')
 }
 
+const PRISM_IMPORTS = {
+    json: () => import('prismjs/components/prism-json.js'),
+    sql: () => import('prismjs/components/prism-sql.js'),
+    markup: () => import('prismjs/components/prism-markup.js'),
+    css: () => import('prismjs/components/prism-css.js'),
+    yaml: () => import('prismjs/components/prism-yaml.js'),
+    markdown: () => import('prismjs/components/prism-markdown.js'),
+    javascript: () => import('prismjs/components/prism-javascript.js'),
+}
+
 async function highlight(code, language) {
     if (!code) return ''
-    const Prism = (await import('prismjs')).default
     const lang = PRISM_LANG[language] ?? 'plain'
-    if (lang === 'json' && !Prism.languages.json) await import('prismjs/components/prism-json.js')
-    else if (lang === 'sql' && !Prism.languages.sql) await import('prismjs/components/prism-sql.js')
-    else if (lang === 'markup' && !Prism.languages.markup) await import('prismjs/components/prism-markup.js')
-    else if (lang === 'css' && !Prism.languages.css) await import('prismjs/components/prism-css.js')
-    else if (lang === 'yaml' && !Prism.languages.yaml) await import('prismjs/components/prism-yaml.js')
-    else if (lang === 'markdown' && !Prism.languages.markdown) await import('prismjs/components/prism-markdown.js')
-    else if (lang === 'javascript' && !Prism.languages.javascript) await import('prismjs/components/prism-javascript.js')
-    const grammar = Prism.languages[lang]
-    if (!grammar) return escapeHtml(code)
-    return Prism.highlight(code, grammar, lang)
+    if (lang === 'plain') return escapeHtml(code)
+
+    const cacheKey = `prism-${lang}`
+    if (!prismCache.has(cacheKey)) {
+        const Prism = (await import('prismjs')).default
+        if (!Prism.languages[lang] && PRISM_IMPORTS[lang]) {
+            await PRISM_IMPORTS[lang]()
+        }
+        if (!Prism.languages[lang]) return escapeHtml(code)
+        prismCache.set(cacheKey, { Prism, lang })
+    }
+    const { Prism } = prismCache.get(cacheKey)
+    return Prism.highlight(code, Prism.languages[lang], lang)
 }
 
 function splitHighlightedLines(html, value) {
@@ -112,6 +125,7 @@ export default function FormatterInput({ value, onChange, language = 'text', cla
     const searchInputRef = useRef(null)
     const textareaRef = useRef(null)
     const scrollRef = useRef(null)
+    const cssVars = useMemo(() => buildCssVars(token), [token])
 
     useEffect(() => {
         let cancelled = false
@@ -184,7 +198,7 @@ export default function FormatterInput({ value, onChange, language = 'text', cla
     }
 
     return (
-        <div className={`formatter-input ${className}`.trim()} style={buildCssVars(token)} onKeyDown={onKeyDown} tabIndex={-1}>
+        <div className={`formatter-input ${className}`.trim()} style={cssVars} onKeyDown={onKeyDown} tabIndex={-1}>
             {searchOpen && (
                 <div className="fi-search-bar">
                     <input

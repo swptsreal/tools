@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, ListMinus } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -8,7 +8,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { removeDuplicateLinesExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -31,14 +31,12 @@ function removeDuplicateLines(value, { trimLines, ignoreCase, removeEmpty }) {
 }
 
 export default function RemoveDuplicateLinesTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, removeDuplicateLinesExample))
+    const [value, setValue] = useDraft(toolId, removeDuplicateLinesExample)
     const [result, setResult] = useState('')
     const [summary, setSummary] = useState('')
     const [trimLines, setTrimLines] = useState(false)
     const [ignoreCase, setIgnoreCase] = useState(false)
     const [removeEmpty, setRemoveEmpty] = useState(false)
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const run = () => { const next = removeDuplicateLines(value, { trimLines, ignoreCase, removeEmpty }); setResult(next.text); setSummary(`Removed ${next.removed} duplicate/empty lines`) }
     const openFile = async (file) => { setValue(await readTextFile(file)); setResult(''); setSummary(''); message.success('Da mo file.'); return false }

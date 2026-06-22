@@ -1,22 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { Splitter } from 'antd'
 
 function useVerticalSplitter() {
-    const [isVertical, setIsVertical] = useState(() =>
-        window.matchMedia('(max-width: 1000px)').matches
-    )
-
-    useEffect(() => {
+    const getSnapshot = () => window.matchMedia('(max-width: 1000px)').matches
+    const subscribe = (callback) => {
         const query = window.matchMedia('(max-width: 1000px)')
-        const update = () => setIsVertical(query.matches)
-
-        update()
-        query.addEventListener('change', update)
-
-        return () => query.removeEventListener('change', update)
-    }, [])
-
-    return isVertical
+        query.addEventListener('change', callback)
+        return () => query.removeEventListener('change', callback)
+    }
+    return useSyncExternalStore(subscribe, getSnapshot)
 }
 
 export function SplitWorkspace({ left, leftToolbar, right }) {

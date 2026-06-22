@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileUp } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -8,7 +8,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { htmlEntityExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -36,13 +36,11 @@ function decodeEntities(text) {
 }
 
 export default function HtmlEntityEncoderDecoderTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, htmlEntityExample))
+    const [value, setValue] = useDraft(toolId, htmlEntityExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [mode, setMode] = useState('Encode')
     const [entityStyle, setEntityStyle] = useState('Named')
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const runEncode = () => {
         setResult(encodeEntities(value, entityStyle))

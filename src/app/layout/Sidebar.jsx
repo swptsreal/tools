@@ -1,14 +1,15 @@
+import { useMemo } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Wrench } from 'lucide-react'
 import { tools } from '../../tools/registry.js'
 
 export function Sidebar({ className = '', onNavigate }) {
-    const groups = tools.reduce((result, tool) => {
+    const groups = useMemo(() => tools.reduce((result, tool) => {
         const group = tool.group || 'Tools'
         result[group] = result[group] || []
         result[group].push(tool)
         return result
-    }, {})
+    }, {}), [])
 
     return (
         <aside className={`app-sidebar ${className}`.trim()}>

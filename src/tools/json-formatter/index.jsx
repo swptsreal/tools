@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
 import { Braces, Clipboard, Download, FileUp, Shrink } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -6,7 +6,8 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { loadDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { jsonExample } from './example.js'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
@@ -29,15 +30,11 @@ function formatJson(value, spacing, sortKeys = false) {
 }
 
 export default function JsonFormatterTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, jsonExample))
+    const [value, setValue] = useDraft(toolId, jsonExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [spacing, setSpacing] = useState(2)
     const [sortKeys, setSortKeys] = useState(false)
-
-    useEffect(() => {
-        saveDraft(toolId, value)
-    }, [value])
 
     const run = (selectedSpacing = spacing) => {
         try {

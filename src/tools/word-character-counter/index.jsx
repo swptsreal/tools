@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, Input, message, Upload } from 'antd'
+import { useMemo } from 'react'
+import { Button, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
@@ -7,7 +7,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { wordCharacterCounterExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -31,9 +31,7 @@ function countText(value) {
 }
 
 export default function WordCharacterCounterTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, wordCharacterCounterExample))
-
-    useEffect(() => saveDraft(toolId, value), [value])
+    const [value, setValue] = useDraft(toolId, wordCharacterCounterExample)
 
     const stats = useMemo(() => countText(value), [value])
 
@@ -67,12 +65,12 @@ export default function WordCharacterCounterTool() {
                 left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />}
                 right={(
                     <div className="text-stats-grid">
-                        <Card><strong>Characters</strong><span data-testid="stat-characters">{stats.characters}</span></Card>
-                        <Card><strong>Characters without spaces</strong><span data-testid="stat-characters-no-spaces">{stats.charactersNoSpaces}</span></Card>
-                        <Card><strong>Words</strong><span data-testid="stat-words">{stats.words}</span></Card>
-                        <Card><strong>Lines</strong><span data-testid="stat-lines">{stats.lines}</span></Card>
-                        <Card><strong>Paragraphs</strong><span data-testid="stat-paragraphs">{stats.paragraphs}</span></Card>
-                        <Card><strong>Bytes</strong><span data-testid="stat-bytes">{stats.bytes}</span></Card>
+                        <div className="stat-card"><strong>Characters</strong><span data-testid="stat-characters">{stats.characters}</span></div>
+                        <div className="stat-card"><strong>Characters without spaces</strong><span data-testid="stat-characters-no-spaces">{stats.charactersNoSpaces}</span></div>
+                        <div className="stat-card"><strong>Words</strong><span data-testid="stat-words">{stats.words}</span></div>
+                        <div className="stat-card"><strong>Lines</strong><span data-testid="stat-lines">{stats.lines}</span></div>
+                        <div className="stat-card"><strong>Paragraphs</strong><span data-testid="stat-paragraphs">{stats.paragraphs}</span></div>
+                        <div className="stat-card"><strong>Bytes</strong><span data-testid="stat-bytes">{stats.bytes}</span></div>
                     </div>
                 )}
             />

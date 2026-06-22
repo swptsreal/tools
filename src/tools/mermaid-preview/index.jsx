@@ -116,7 +116,7 @@ export default function MermaidPreviewTool() {
                 </Button>
             </>
         ),
-        [value, theme]
+        [value]
     )
 
     useToolActions(actions)

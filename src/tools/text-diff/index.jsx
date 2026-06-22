@@ -45,7 +45,7 @@ export default function TextDiffTool() {
         const result = await copyText(output)
         message[result.ok ? 'success' : 'warning'](result.message)
     }
-    const actions = useMemo(() => <><Button icon={<GitCompare size={16} />} type="primary" onClick={compare}>Compare</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(output, 'text-diff.txt')}>Download</Button><RevertExample onClick={reset} /></>, [original, changed, output])
+    const actions = useMemo(() => <><Button icon={<GitCompare size={16} />} type="primary" onClick={compare}>Compare</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(output, 'text-diff.txt')}>Download</Button><RevertExample onClick={reset} /></>, [output])
     useToolActions(actions)
 
     return (

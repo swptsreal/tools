@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileUp, ArrowDownAZ } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -8,7 +8,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { sortLinesExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -27,14 +27,12 @@ function sortLines(value, { direction, trimLines, removeEmpty, caseInsensitive }
 }
 
 export default function SortLinesTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, sortLinesExample))
+    const [value, setValue] = useDraft(toolId, sortLinesExample)
     const [result, setResult] = useState('')
     const [direction, setDirection] = useState('Ascending')
     const [trimLines, setTrimLines] = useState(false)
     const [removeEmpty, setRemoveEmpty] = useState(false)
     const [caseInsensitive, setCaseInsensitive] = useState(false)
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const run = () => setResult(sortLines(value, { direction, trimLines, removeEmpty, caseInsensitive }))
     const openFile = async (file) => { setValue(await readTextFile(file)); setResult(''); message.success('Da mo file.'); return false }

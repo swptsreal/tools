@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { Button, message, Radio, Upload } from 'antd'
 import {
     Clipboard,
@@ -10,8 +10,6 @@ import {
     Shrink,
     Wand2
 } from 'lucide-react'
-import SwaggerUI from 'swagger-ui-react'
-import 'swagger-ui-react/swagger-ui.css'
 import { parseDocument } from 'yaml'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
@@ -69,6 +67,8 @@ function minifyYaml(value) {
         .join('\n')
         .trim()
 }
+
+const SwaggerPreview = lazy(() => import('./SwaggerPreview.jsx'))
 
 function isObject(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -141,11 +141,9 @@ function YamlPreviewContent({ state }) {
     if (isOpenApi(state.data)) {
         return (
             <div className="yaml-swagger-preview">
-                <SwaggerUI
-                    spec={state.data}
-                    docExpansion="full"
-                    defaultModelsExpandDepth={1}
-                />
+                <Suspense fallback={<div className="yaml-muted" style={{ padding: 40, textAlign: 'center' }}>Loading Swagger UI…</div>}>
+                    <SwaggerPreview spec={state.data} />
+                </Suspense>
             </div>
         )
     }

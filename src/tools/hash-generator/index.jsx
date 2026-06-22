@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, Fingerprint, FileUp } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -8,7 +8,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { hashExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -31,12 +31,10 @@ async function generateHashes(text, selectedAlgorithms = algorithms) {
 }
 
 export default function HashGeneratorTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, hashExample))
+    const [value, setValue] = useDraft(toolId, hashExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [algorithm, setAlgorithm] = useState('SHA-256')
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const runGenerate = async () => {
         try {

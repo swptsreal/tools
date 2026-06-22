@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Database, Download, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -6,7 +6,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { sqlExample } from './example.js'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
@@ -16,14 +16,10 @@ import './style.css'
 const toolId = 'sql-formatter'
 
 export default function SqlFormatterTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, sqlExample))
+    const [value, setValue] = useDraft(toolId, sqlExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [keywordCase, setKeywordCase] = useState('upper')
-
-    useEffect(() => {
-        saveDraft(toolId, value)
-    }, [value])
 
     const formatSql = async () => {
         try {

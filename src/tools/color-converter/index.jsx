@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, message, Radio } from 'antd'
 import { Clipboard, Download, Palette } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -7,7 +7,7 @@ import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { colorExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -59,12 +59,10 @@ function convertColor(input, outputFormat = 'All') {
 }
 
 export default function ColorConverterTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, colorExample))
+    const [value, setValue] = useDraft(toolId, colorExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [outputFormat, setOutputFormat] = useState('All')
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const run = () => {
         try {

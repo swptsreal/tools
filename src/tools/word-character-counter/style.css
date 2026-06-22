@@ -14,6 +14,13 @@
     gap: 12px;
 }
 
+.stat-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+}
+
 .text-stats-grid strong,
 .text-stats-grid span {
     display: block;

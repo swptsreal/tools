@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileCode2, FileSearch, FileUp } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -8,7 +8,7 @@ import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { urlExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -16,13 +16,11 @@ import './style.css'
 const toolId = 'url-encoder-decoder'
 
 export default function UrlEncoderDecoderTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, urlExample))
+    const [value, setValue] = useDraft(toolId, urlExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [mode, setMode] = useState('Encode')
     const [plusAsSpace, setPlusAsSpace] = useState(true)
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const runEncode = () => {
         setResult(encodeURIComponent(value))

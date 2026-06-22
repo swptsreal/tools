@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Upload } from 'antd'
 import { Clipboard, Download, FileUp, RotateCcw, Share2 } from 'lucide-react'
-import pako from 'pako'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -109,7 +108,7 @@ export default function MarkdownPreviewTool() {
                 </Button>
             </>
         ),
-        [value, lineBreaks]
+        [value]
     )
 
     useToolActions(actions)

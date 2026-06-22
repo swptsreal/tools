@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, message, Radio } from 'antd'
 import { CalendarClock, Clipboard, Download, TimerReset } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -7,7 +7,7 @@ import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { timestampExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -30,13 +30,11 @@ function dateToTimestamp(value) {
 }
 
 export default function TimestampConverterTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, timestampExample))
+    const [value, setValue] = useDraft(toolId, timestampExample)
     const [result, setResult] = useState('')
     const [error, setError] = useState('')
     const [direction, setDirection] = useState('Timestamp to Date')
     const [unit, setUnit] = useState('Seconds')
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const run = (converter) => {
         try {

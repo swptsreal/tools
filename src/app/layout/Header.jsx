@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Button } from 'antd'
 import { Menu, Wrench } from 'lucide-react'
@@ -5,7 +6,10 @@ import { tools } from '../../tools/registry.js'
 
 export function AppHeader({ actions, onOpenNavigation }) {
     const { pathname } = useLocation()
-    const activeTool = tools.find((tool) => pathname === `/tools/${tool.id}`)
+    const activeTool = useMemo(
+        () => tools.find((tool) => pathname === `/tools/${tool.id}`),
+        [pathname]
+    )
 
     return (
         <header className="app-header">

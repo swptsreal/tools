@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
 import { Clipboard, Download, FileJson, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -8,7 +8,7 @@ import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
-import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
+import { useDraft } from '../../shared/hooks/useDraft.js'
 import { jsonYamlExample } from './example.js'
 import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
@@ -60,13 +60,11 @@ function fromSimpleYaml(input) {
 }
 
 export default function JsonYamlConverterTool() {
-    const [value, setValue] = useState(() => loadDraft(toolId, jsonYamlExample))
+    const [value, setValue] = useDraft(toolId, jsonYamlExample)
     const [result, setResult] = useState('')
     const [language, setLanguage] = useState('yaml')
     const [error, setError] = useState('')
     const [direction, setDirection] = useState('JSON to YAML')
-
-    useEffect(() => saveDraft(toolId, value), [value])
 
     const convertJsonToYaml = () => {
         try {

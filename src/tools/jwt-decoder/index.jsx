@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, Download, FileCode2, FileUp, RotateCcw } from 'lucide-react'
+import { Button, message, Radio, Upload } from 'antd'
+import { Clipboard, Download, FileCode2, FileUp } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -10,6 +10,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { jwtExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'jwt-decoder'
@@ -89,7 +90,7 @@ export default function JwtDecoderTool() {
             <Button icon={<FileCode2 size={16} />} type="primary" onClick={runDecode}>Decode</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'jwt.json')}>Download</Button>
-            <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+            <RevertExample onClick={resetExample} />
         </>
     ), [result, section, value])
 

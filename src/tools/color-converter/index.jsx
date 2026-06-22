@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio } from 'antd'
-import { Clipboard, Download, Palette, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, Palette } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -9,6 +9,7 @@ import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { colorExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'color-converter'
@@ -91,7 +92,7 @@ export default function ColorConverterTool() {
             <Button icon={<Palette size={16} />} type="primary" onClick={run}>Convert Color</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'color-conversion.txt')}>Download</Button>
-            <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+            <RevertExample onClick={resetExample} />
         </>
     ), [outputFormat, result, value])
 

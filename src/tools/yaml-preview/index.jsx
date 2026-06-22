@@ -21,6 +21,7 @@ import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { yamlPreviewExample } from './example.js'
 import './style.css'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 
 const toolId = 'yaml-preview'
 
@@ -173,7 +174,7 @@ export default function YamlPreviewTool() {
                     : formatYaml(value, indentSize)
             updateYaml(nextValue)
             message.success(
-                mode === 'minify' ? 'YAML minified.' : 'YAML formatted.'
+                mode === 'minify' ? 'YAML minified' : 'YAML formatted'
             )
         } catch (err) {
             setPreviewValue(value)
@@ -184,7 +185,7 @@ export default function YamlPreviewTool() {
     const validate = () => {
         try {
             parseYaml(value)
-            message.success('YAML hop le.')
+            message.success('Valid YAML')
             setPreviewValue(value)
         } catch (err) {
             message.error(`Invalid YAML: ${err.message}`)
@@ -195,7 +196,7 @@ export default function YamlPreviewTool() {
     const openFile = async (file) => {
         const nextValue = await readTextFile(file)
         updateYaml(nextValue)
-        message.success('Da mo file.')
+        message.success('File opened')
         return false
     }
 
@@ -251,9 +252,7 @@ export default function YamlPreviewTool() {
                 >
                     Download
                 </Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>
-                    Example
-                </Button>
+                <RevertExample onClick={resetExample} />
                 <label className="yaml-auto-preview-toggle">
                     <input
                         type="checkbox"
@@ -294,7 +293,8 @@ export default function YamlPreviewTool() {
                             ]}
                         />
                     </div>
-                    <FormatterInput language="yaml"
+                    <FormatterInput
+                        language="yaml"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}

@@ -85,6 +85,64 @@ test('opens the default Mermaid tool and renders a diagram', async ({ page }) =>
     await expect(page.locator('.mermaid-svg svg')).toBeVisible()
 })
 
+test('Mermaid Preview updates URL hash on edit and loads state from URL hash', async ({ page }) => {
+    await page.goto('/tools/mermaid-preview')
+
+    // Fill textarea
+    await page.locator('textarea').fill('graph TD\n    A[Test URL Share] --> B[Works]')
+
+    // Wait for the preview SVG to render the new value (ensuring debounced state has updated)
+    await expect(page.locator('.mermaid-svg')).toContainText('Test URL Share')
+
+    // Wait for the URL to contain `#pako:`
+    await expect(page).toHaveURL(/#pako:/)
+    const sharedUrl = page.url()
+
+    // Now navigate to a different tool to reset state
+    await page.goto('/tools/json-formatter')
+    await expect(page.getByRole('heading', { name: 'JSON Formatter' })).toBeVisible()
+
+    // Now go back directly to the sharedUrl
+    await page.goto(sharedUrl)
+    await expect(page.getByRole('heading', { name: 'Mermaid Preview' })).toBeVisible()
+
+    // Verify textarea has the loaded value
+    await expect(page.locator('textarea')).toHaveValue('graph TD\n    A[Test URL Share] --> B[Works]')
+})
+
+test('Mermaid Preview handles theme sync and Share button copy action', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await page.goto('/tools/mermaid-preview')
+
+    // Change theme to Dark
+    await page.getByText('Dark', { exact: true }).click()
+
+    // Fill textarea
+    await page.locator('textarea').fill('graph TD\n    A --> B')
+
+    // Wait for the preview SVG to update (old default text gone)
+    await expect(page.locator('.mermaid-svg')).not.toContainText('Open Useful Tools')
+
+    // Wait for URL hash
+    await expect(page).toHaveURL(/#pako:/)
+    const sharedUrl = page.url()
+
+    // Click Share button
+    await page.getByRole('button', { name: 'Share' }).click()
+
+    // Verify toast message
+    await expect(page.locator('.ant-message-success')).toContainText('Đã sao chép liên kết chia sẻ.')
+
+    // Verify clipboard value matches URL
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText())
+    expect(clipboardText).toBe(sharedUrl)
+
+    // Load the URL in a new context or navigate directly
+    await page.goto(sharedUrl)
+    await expect(page.locator('.ant-radio-button-wrapper-checked')).toContainText('Dark')
+    await expect(page.locator('textarea')).toHaveValue('graph TD\n    A --> B')
+})
+
 test('opens Markdown Preview and renders markdown with Mermaid blocks', async ({ page }) => {
     await page.goto('/tools/markdown-preview')
 

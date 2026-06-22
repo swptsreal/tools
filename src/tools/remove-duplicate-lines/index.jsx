@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Upload } from 'antd'
-import { Clipboard, Download, FileUp, ListMinus, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, FileUp, ListMinus } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -10,6 +10,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { removeDuplicateLinesExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'remove-duplicate-lines'
@@ -43,7 +44,7 @@ export default function RemoveDuplicateLinesTool() {
     const openFile = async (file) => { setValue(await readTextFile(file)); setResult(''); setSummary(''); message.success('Da mo file.'); return false }
     const copy = async () => { const copyResult = await copyText(result || value); message[copyResult.ok ? 'success' : 'warning'](copyResult.message) }
 
-    const actions = useMemo(() => <><Upload beforeUpload={openFile} showUploadList={false} accept=".txt,.csv,.log"><Button icon={<FileUp size={16} />}>Open</Button></Upload><Button icon={<ListMinus size={16} />} type="primary" onClick={run}>Remove Duplicates</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'unique-lines.txt')}>Download</Button><Button icon={<RotateCcw size={16} />} onClick={() => { setValue(removeDuplicateLinesExample); setResult(''); setSummary('') }}>Example</Button></>, [value, result, trimLines, ignoreCase, removeEmpty])
+    const actions = useMemo(() => <><Upload beforeUpload={openFile} showUploadList={false} accept=".txt,.csv,.log"><Button icon={<FileUp size={16} />}>Open</Button></Upload><Button icon={<ListMinus size={16} />} type="primary" onClick={run}>Remove Duplicates</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'unique-lines.txt')}>Download</Button><RevertExample onClick={() => { setValue(removeDuplicateLinesExample); setResult(''); setSummary('') }} /></>, [value, result, trimLines, ignoreCase, removeEmpty])
     useToolActions(actions)
 
     return <div className="tool-page text-tool-page"><SplitWorkspace leftToolbar={<><Checkbox checked={trimLines} onChange={(event) => setTrimLines(event.target.checked)}>Trim lines</Checkbox><Checkbox checked={ignoreCase} onChange={(event) => setIgnoreCase(event.target.checked)}>Ignore case</Checkbox><Checkbox checked={removeEmpty} onChange={(event) => setRemoveEmpty(event.target.checked)}>Remove empty lines</Checkbox></>} left={<FormatterInput language="text" className="tool-editor" value={value} onChange={(event) => setValue(event.target.value)} spellCheck={false} />} right={<><div className="text-tool-summary">{summary || 'Run Remove Duplicates to see summary.'}</div><FormatterOutput code={result} language="text" /></>} /></div>

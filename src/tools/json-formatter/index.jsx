@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
-import { Braces, Clipboard, Download, FileUp, RotateCcw, Shrink } from 'lucide-react'
+import { Braces, Clipboard, Download, FileUp, Shrink } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -10,6 +10,7 @@ import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { jsonExample } from './example.js'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'json-formatter'
@@ -77,7 +78,7 @@ export default function JsonFormatterTool() {
                 <Button icon={<Shrink size={16} />} onClick={() => run(0)}>Minify</Button>
                 <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
                 <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'formatted.json', 'application/json')}>Download</Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+                <RevertExample onClick={resetExample} />
             </>
         ),
         [result, value]

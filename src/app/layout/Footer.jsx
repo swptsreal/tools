@@ -6,7 +6,7 @@ export function AppFooter() {
             <span>Useful Tools v0.1.0</span>
             <span className="offline-status">
                 <WifiOff size={14} />
-                Offline-first
+                Offline
             </span>
         </footer>
     )

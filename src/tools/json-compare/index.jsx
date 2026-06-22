@@ -4,7 +4,6 @@ import {
     Clipboard,
     Download,
     GitCompareArrows,
-    RotateCcw,
     Shuffle
 } from 'lucide-react'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -13,6 +12,7 @@ import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { leftJsonExample, rightJsonExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const leftDraftId = 'json-compare-left'
@@ -235,9 +235,7 @@ export default function JsonCompareTool() {
                 >
                     Download
                 </Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>
-                    Example
-                </Button>
+                <RevertExample onClick={resetExample} />
             </>
         ),
         [leftValue, resultText, rightValue]

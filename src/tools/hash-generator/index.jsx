@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, Download, Fingerprint, FileUp, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, Fingerprint, FileUp } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -10,6 +10,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { hashExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'hash-generator'
@@ -74,7 +75,7 @@ export default function HashGeneratorTool() {
             <Button icon={<Fingerprint size={16} />} type="primary" onClick={runGenerate}>Generate Hashes</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'hashes.txt')}>Download</Button>
-            <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+            <RevertExample onClick={resetExample} />
         </>
     ), [algorithm, result, value])
 

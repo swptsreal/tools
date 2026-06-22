@@ -13,6 +13,7 @@ import { markdownExample } from './example.js'
 import { MarkdownPreview } from './Preview.jsx'
 import './markdown.css'
 import './style.css'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 
 const toolId = 'markdown-preview'
 
@@ -39,12 +40,25 @@ export default function MarkdownPreviewTool() {
     const actions = useMemo(
         () => (
             <>
-                <Upload beforeUpload={openFile} showUploadList={false} accept=".md,.txt">
+                <Upload
+                    beforeUpload={openFile}
+                    showUploadList={false}
+                    accept=".md,.txt"
+                >
                     <Button icon={<FileUp size={16} />}>Open</Button>
                 </Upload>
-                <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
-                <Button icon={<Download size={16} />} onClick={() => downloadTextFile(value, 'document.md', 'text/markdown')}>Download</Button>
-                <Button icon={<RotateCcw size={16} />} onClick={() => setValue(markdownExample)}>Example</Button>
+                <Button icon={<Clipboard size={16} />} onClick={copy}>
+                    Copy
+                </Button>
+                <Button
+                    icon={<Download size={16} />}
+                    onClick={() =>
+                        downloadTextFile(value, 'document.md', 'text/markdown')
+                    }
+                >
+                    Download
+                </Button>
+                <RevertExample onClick={() => setValue(markdownExample)} />
             </>
         ),
         [value]
@@ -55,13 +69,21 @@ export default function MarkdownPreviewTool() {
     return (
         <div className="tool-page">
             <SplitWorkspace
-                leftToolbar={(
+                leftToolbar={
                     <>
-                        <Checkbox checked={lineBreaks} onChange={(event) => setLineBreaks(event.target.checked)}>Line breaks</Checkbox>
+                        <Checkbox
+                            checked={lineBreaks}
+                            onChange={(event) =>
+                                setLineBreaks(event.target.checked)
+                            }
+                        >
+                            Line breaks
+                        </Checkbox>
                     </>
-                )}
+                }
                 left={
-                    <FormatterInput language="markdown"
+                    <FormatterInput
+                        language="markdown"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}

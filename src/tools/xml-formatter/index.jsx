@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, CodeXml, Download, FileUp, RotateCcw, Shrink } from 'lucide-react'
+import { Clipboard, CodeXml, Download, FileUp, Shrink } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -10,6 +10,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { xmlExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'xml-formatter'
@@ -32,13 +33,19 @@ function formatXml(value, indentSize) {
     const tokens = compact.replace(/(>)(<)(\/?)/g, '$1\n$2$3').split('\n')
     let depth = 0
 
-    return tokens.map((token) => {
-        const trimmed = token.trim()
-        if (/^<\//.test(trimmed)) depth = Math.max(depth - 1, 0)
-        const line = `${' '.repeat(depth * indentSize)}${trimmed}`
-        if (/^<[^!?/][^>]*[^/]>/.test(trimmed) && !/^<([^\s>]+)[^>]*>.*<\/\1>$/.test(trimmed)) depth += 1
-        return line
-    }).join('\n')
+    return tokens
+        .map((token) => {
+            const trimmed = token.trim()
+            if (/^<\//.test(trimmed)) depth = Math.max(depth - 1, 0)
+            const line = `${' '.repeat(depth * indentSize)}${trimmed}`
+            if (
+                /^<[^!?/][^>]*[^/]>/.test(trimmed) &&
+                !/^<([^\s>]+)[^>]*>.*<\/\1>$/.test(trimmed)
+            )
+                depth += 1
+            return line
+        })
+        .join('\n')
 }
 
 export default function XmlFormatterTool() {
@@ -53,10 +60,13 @@ export default function XmlFormatterTool() {
 
     const run = (mode = 'format') => {
         try {
-            const nextResult = mode === 'minify' ? minifyXml(value) : formatXml(value, indentSize)
+            const nextResult =
+                mode === 'minify'
+                    ? minifyXml(value)
+                    : formatXml(value, indentSize)
             setResult(nextResult)
             setError('')
-            if (mode === 'validate') message.success('XML hop le.')
+            if (mode === 'validate') message.success('Valid XML')
         } catch (err) {
             setResult('')
             setError(`Invalid XML: ${err.message}`)
@@ -67,7 +77,7 @@ export default function XmlFormatterTool() {
         setValue(await readTextFile(file))
         setResult('')
         setError('')
-        message.success('Da mo file.')
+        message.success('File opened')
         return false
     }
 
@@ -85,15 +95,43 @@ export default function XmlFormatterTool() {
     const actions = useMemo(
         () => (
             <>
-                <Upload beforeUpload={openFile} showUploadList={false} accept=".xml,.svg,.txt">
+                <Upload
+                    beforeUpload={openFile}
+                    showUploadList={false}
+                    accept=".xml,.svg,.txt"
+                >
                     <Button icon={<FileUp size={16} />}>Open</Button>
                 </Upload>
-                <Button icon={<CodeXml size={16} />} type="primary" onClick={() => run('format')}>Format</Button>
-                <Button icon={<Shrink size={16} />} onClick={() => run('minify')}>Minify</Button>
+                <Button
+                    icon={<CodeXml size={16} />}
+                    type="primary"
+                    onClick={() => run('format')}
+                >
+                    Format
+                </Button>
+                <Button
+                    icon={<Shrink size={16} />}
+                    onClick={() => run('minify')}
+                >
+                    Minify
+                </Button>
                 <Button onClick={() => run('validate')}>Validate</Button>
-                <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
-                <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'formatted.xml', 'application/xml')}>Download</Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+                <Button icon={<Clipboard size={16} />} onClick={copy}>
+                    Copy
+                </Button>
+                <Button
+                    icon={<Download size={16} />}
+                    onClick={() =>
+                        downloadTextFile(
+                            result || value,
+                            'formatted.xml',
+                            'application/xml'
+                        )
+                    }
+                >
+                    Download
+                </Button>
+                <RevertExample onClick={resetExample} />
             </>
         ),
         [indentSize, result, value]
@@ -104,21 +142,39 @@ export default function XmlFormatterTool() {
     return (
         <div className="tool-page formatter-page xml-formatter-page">
             <SplitWorkspace
-                leftToolbar={(
+                leftToolbar={
                     <>
                         <span className="tool-function-label">Indent</span>
-                        <Radio.Group optionType="button" size="small" value={indentSize} onChange={(event) => setIndentSize(event.target.value)} options={[{ label: '2 spaces', value: 2 }, { label: '4 spaces', value: 4 }]} />
+                        <Radio.Group
+                            optionType="button"
+                            size="small"
+                            value={indentSize}
+                            onChange={(event) =>
+                                setIndentSize(event.target.value)
+                            }
+                            options={[
+                                { label: '2 spaces', value: 2 },
+                                { label: '4 spaces', value: 4 }
+                            ]}
+                        />
                     </>
-                )}
+                }
                 left={
-                    <FormatterInput language="xml"
+                    <FormatterInput
+                        language="xml"
                         className="tool-editor"
                         value={value}
                         onChange={(event) => setValue(event.target.value)}
                         spellCheck={false}
                     />
                 }
-                right={error ? <pre className="formatter-error">{error}</pre> : <FormatterOutput code={result} language="html" />}
+                right={
+                    error ? (
+                        <pre className="formatter-error">{error}</pre>
+                    ) : (
+                        <FormatterOutput code={result} language="html" />
+                    )
+                }
             />
         </div>
     )

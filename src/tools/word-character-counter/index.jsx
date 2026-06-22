@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, Input, message, Upload } from 'antd'
-import { Clipboard, Download, FileUp, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
@@ -9,6 +9,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { wordCharacterCounterExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'word-character-counter'
@@ -54,7 +55,7 @@ export default function WordCharacterCounterTool() {
             </Upload>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(value, 'text.txt')}>Download</Button>
-            <Button icon={<RotateCcw size={16} />} onClick={() => setValue(wordCharacterCounterExample)}>Example</Button>
+            <RevertExample onClick={() => setValue(wordCharacterCounterExample)} />
         </>
     ), [value])
 

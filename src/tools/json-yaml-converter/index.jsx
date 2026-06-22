@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, Download, FileJson, FileUp, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, FileJson, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
@@ -10,6 +10,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { jsonYamlExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'json-yaml-converter'
@@ -124,7 +125,7 @@ export default function JsonYamlConverterTool() {
             <Button icon={<FileJson size={16} />} type="primary" onClick={convert}>Convert</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, language === 'json' ? 'converted.json' : 'converted.yaml')}>Download</Button>
-            <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+            <RevertExample onClick={resetExample} />
         </>
     ), [direction, result, value, language])
 

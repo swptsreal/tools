@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Button, message } from 'antd'
-import { Clipboard, Download, GitCompare, RotateCcw } from 'lucide-react'
+import { Clipboard, Download, GitCompare } from 'lucide-react'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
 import { downloadTextFile } from '../../shared/utils/download.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const originalExample = 'alpha\nbeta\ngamma'
@@ -44,7 +45,7 @@ export default function TextDiffTool() {
         const result = await copyText(output)
         message[result.ok ? 'success' : 'warning'](result.message)
     }
-    const actions = useMemo(() => <><Button icon={<GitCompare size={16} />} type="primary" onClick={compare}>Compare</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(output, 'text-diff.txt')}>Download</Button><Button icon={<RotateCcw size={16} />} onClick={reset}>Example</Button></>, [original, changed, output])
+    const actions = useMemo(() => <><Button icon={<GitCompare size={16} />} type="primary" onClick={compare}>Compare</Button><Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button><Button icon={<Download size={16} />} onClick={() => downloadTextFile(output, 'text-diff.txt')}>Download</Button><RevertExample onClick={reset} /></>, [original, changed, output])
     useToolActions(actions)
 
     return (

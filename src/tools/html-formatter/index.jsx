@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, CodeXml, Download, FileUp, RotateCcw } from 'lucide-react'
+import { Clipboard, CodeXml, Download, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -10,6 +10,7 @@ import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { htmlExample } from './example.js'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'html-formatter'
@@ -63,7 +64,7 @@ export default function HtmlFormatterTool() {
                 <Button icon={<CodeXml size={16} />} type="primary" onClick={formatHtml}>Format</Button>
                 <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
                 <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'formatted.html', 'text/html')}>Download</Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+                <RevertExample onClick={resetExample} />
             </>
         ),
         [indentSize, result, value]

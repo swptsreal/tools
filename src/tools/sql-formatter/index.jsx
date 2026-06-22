@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, Database, Download, FileUp, RotateCcw } from 'lucide-react'
+import { Clipboard, Database, Download, FileUp } from 'lucide-react'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
 import { useToolActions } from '../../shared/components/ToolChromeContext.jsx'
 import { copyText } from '../../shared/utils/clipboard.js'
@@ -10,6 +10,7 @@ import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { sqlExample } from './example.js'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'sql-formatter'
@@ -63,7 +64,7 @@ export default function SqlFormatterTool() {
                 <Button icon={<Database size={16} />} type="primary" onClick={formatSql}>Format</Button>
                 <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
                 <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'formatted.sql')}>Download</Button>
-                <Button icon={<RotateCcw size={16} />} onClick={resetExample}>Example</Button>
+                <RevertExample onClick={resetExample} />
             </>
         ),
         [keywordCase, result, value]

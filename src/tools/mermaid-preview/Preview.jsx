@@ -17,13 +17,17 @@ async function getMermaid() {
     return mermaidInstance
 }
 
-export function MermaidPreview({ value }) {
+export function MermaidPreview({ value, theme }) {
     const [svg, setSvg] = useState('')
     const [error, setError] = useState('')
     const [scale, setScale] = useState(1)
     const [pan, setPan] = useState({ x: 0, y: 0 })
     const [isPanning, setIsPanning] = useState(false)
     const dragRef = useRef(null)
+
+    const MAX_SCALE = 5
+    const MIN_SCALE = 0.5
+    const SCALE_STEP = 0.5
 
     useEffect(() => {
         let cancelled = false
@@ -35,6 +39,9 @@ export function MermaidPreview({ value }) {
             }
             try {
                 const mermaid = await getMermaid()
+                mermaid.initialize({
+                    theme: theme?.toLowerCase() === 'dark' ? 'dark' : 'default'
+                })
                 const result = await mermaid.render(
                     `mermaid-${Date.now()}`,
                     value,
@@ -52,7 +59,9 @@ export function MermaidPreview({ value }) {
             }
         }
         renderPreview()
-        return () => { cancelled = true }
+        return () => {
+            cancelled = true
+        }
     }, [value])
 
     const startPan = (event) => {
@@ -90,9 +99,25 @@ export function MermaidPreview({ value }) {
     return (
         <div className="mermaid-preview">
             <div className="preview-toolbar">
-                <button onClick={() => setScale((current) => Math.max(0.5, current - 0.1))}>-</button>
+                <button
+                    onClick={() =>
+                        setScale((current) =>
+                            Math.max(MIN_SCALE, current - SCALE_STEP)
+                        )
+                    }
+                >
+                    -
+                </button>
                 <span>{Math.round(scale * 100)}%</span>
-                <button onClick={() => setScale((current) => Math.min(3, current + 0.1))}>+</button>
+                <button
+                    onClick={() =>
+                        setScale((current) =>
+                            Math.min(MAX_SCALE, current + SCALE_STEP)
+                        )
+                    }
+                >
+                    +
+                </button>
                 <button onClick={resetView}>Reset</button>
             </div>
             <div
@@ -106,7 +131,9 @@ export function MermaidPreview({ value }) {
                 {!error && svg ? (
                     <div
                         className="mermaid-svg"
-                        style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
+                        style={{
+                            transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`
+                        }}
                         dangerouslySetInnerHTML={{ __html: svg }}
                     />
                 ) : null}

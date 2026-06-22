@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Input, message, Radio, Upload } from 'antd'
-import { Clipboard, Download, FileUp, RotateCcw, ArrowDownAZ } from 'lucide-react'
+import { Clipboard, Download, FileUp, ArrowDownAZ } from 'lucide-react'
 import FormatterOutput from '../../shared/components/FormatterOutput.jsx'
 import FormatterInput from '../../shared/components/FormatterInput.jsx'
 import { SplitWorkspace } from '../../shared/components/SplitWorkspace.jsx'
@@ -10,6 +10,7 @@ import { downloadTextFile } from '../../shared/utils/download.js'
 import { readTextFile } from '../../shared/utils/fileReader.js'
 import { loadDraft, saveDraft } from '../../shared/utils/localDraft.js'
 import { sortLinesExample } from './example.js'
+import RevertExample from '../../shared/components/RevertExample.jsx'
 import './style.css'
 
 const toolId = 'sort-lines'
@@ -45,7 +46,7 @@ export default function SortLinesTool() {
             <Button icon={<ArrowDownAZ size={16} />} type="primary" onClick={run}>Sort</Button>
             <Button icon={<Clipboard size={16} />} onClick={copy}>Copy</Button>
             <Button icon={<Download size={16} />} onClick={() => downloadTextFile(result || value, 'sorted-lines.txt')}>Download</Button>
-            <Button icon={<RotateCcw size={16} />} onClick={() => { setValue(sortLinesExample); setResult('') }}>Example</Button>
+            <RevertExample onClick={() => { setValue(sortLinesExample); setResult('') }} />
         </>
     ), [value, result, direction, trimLines, removeEmpty, caseInsensitive])
 

@@ -208,6 +208,50 @@ export const tools = [
         Component: lazy(() => import('./color-converter/index.jsx'))
     },
     {
+        id: 'text-diff',
+        name: 'Text Diff',
+        group: 'Text',
+        description:
+            'Compare two text blocks and show line differences offline.',
+        icon: GitCompareArrows,
+        Component: lazy(() => import('./text-diff/index.jsx'))
+    },
+    {
+        id: 'sort-lines',
+        name: 'Sort Lines',
+        group: 'Text',
+        description: 'Sort text lines ascending or descending offline.',
+        icon: ArrowDownAZ,
+        Component: lazy(() => import('./sort-lines/index.jsx'))
+    },
+    {
+        id: 'remove-duplicate-lines',
+        name: 'Remove Duplicate Lines',
+        group: 'Text',
+        description:
+            'Remove repeated lines while preserving first occurrence offline.',
+        icon: ListMinus,
+        Component: lazy(() => import('./remove-duplicate-lines/index.jsx'))
+    },
+    {
+        id: 'case-converter',
+        name: 'Case Converter',
+        group: 'Text',
+        description:
+            'Convert text between common letter and identifier cases offline.',
+        icon: LetterText,
+        Component: lazy(() => import('./case-converter/index.jsx'))
+    },
+    {
+        id: 'word-character-counter',
+        name: 'Word Character Counter',
+        group: 'Text',
+        description:
+            'Count words, characters, lines, paragraphs, and bytes offline.',
+        icon: AlignLeft,
+        Component: lazy(() => import('./word-character-counter/index.jsx'))
+    },
+    {
         id: 'unit-converter',
         name: 'Unit Converter',
         group: 'Developer',
@@ -268,50 +312,5 @@ export const tools = [
             'Parse URL parts, query params, and rebuilt output offline.',
         icon: Link,
         Component: lazy(() => import('./url-parser/index.jsx'))
-    },
-
-    {
-        id: 'text-diff',
-        name: 'Text Diff',
-        group: 'Text',
-        description:
-            'Compare two text blocks and show line differences offline.',
-        icon: GitCompareArrows,
-        Component: lazy(() => import('./text-diff/index.jsx'))
-    },
-    {
-        id: 'sort-lines',
-        name: 'Sort Lines',
-        group: 'Text',
-        description: 'Sort text lines ascending or descending offline.',
-        icon: ArrowDownAZ,
-        Component: lazy(() => import('./sort-lines/index.jsx'))
-    },
-    {
-        id: 'remove-duplicate-lines',
-        name: 'Remove Duplicate Lines',
-        group: 'Text',
-        description:
-            'Remove repeated lines while preserving first occurrence offline.',
-        icon: ListMinus,
-        Component: lazy(() => import('./remove-duplicate-lines/index.jsx'))
-    },
-    {
-        id: 'case-converter',
-        name: 'Case Converter',
-        group: 'Text',
-        description:
-            'Convert text between common letter and identifier cases offline.',
-        icon: LetterText,
-        Component: lazy(() => import('./case-converter/index.jsx'))
-    },
-    {
-        id: 'word-character-counter',
-        name: 'Word Character Counter',
-        group: 'Text',
-        description:
-            'Count words, characters, lines, paragraphs, and bytes offline.',
-        icon: AlignLeft,
-        Component: lazy(() => import('./word-character-counter/index.jsx'))
     }
 ]
